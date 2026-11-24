@@ -1,0 +1,1 @@
+{"dependencies":{"@vercel/postgres":"^0.10.0","resend":"latest","stripe":"^23.0.0"},"description":"LitCasa — LED lights dropshipping store (Vercel-native, static frontend + serverless API)","engines":{"node":">=18"},"name":"litcasa-site","private":true,"version":"0.1.0"}
