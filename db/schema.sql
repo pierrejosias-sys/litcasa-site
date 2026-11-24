@@ -129,7 +129,11 @@ COMMENT ON TABLE orders IS 'Checkouts. id format LC-YYYYMMDD-NNN, sequential per
 -- --------------------------------------------------------------------------
 -- order_items — one row per product line on an order. product_name,
 --   unit_price_cents and line_total_cents are snapshots taken at checkout,
---   so later price/product changes do not rewrite history.
+--   so later price/product changes do not rewrite history. options is
+--   the line's configurator options (jsonb, null = plain add) — e.g.
+--   { color, size, brightness, finish?, customText? } — normalized
+--   server-side by api/_lib/options.js. Two lines for the same product
+--   with different options are separate rows here.
 -- --------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS order_items (
   id               serial PRIMARY KEY,
@@ -138,8 +142,17 @@ CREATE TABLE IF NOT EXISTS order_items (
   product_name     text NOT NULL,                  -- snapshot at checkout
   quantity         integer NOT NULL CHECK (quantity > 0),
   unit_price_cents integer NOT NULL CHECK (unit_price_cents >= 0),
-  line_total_cents integer NOT NULL CHECK (line_total_cents >= 0)
+  line_total_cents integer NOT NULL CHECK (line_total_cents >= 0),
+  options          jsonb                           -- configurator options, null = plain add
 );
+
+-- Added for the configurator-options fix (Nov 24, 2026): keep this
+-- idempotent ALTER alongside the CREATE TABLE above so re-running
+-- schema.sql also upgrades databases created before the column existed.
+-- Run the same statement once in the Vercel Query editor for the live
+-- litcasa-db — the API degrades gracefully (options not persisted)
+-- until it has been applied, but options are only stored after it.
+ALTER TABLE order_items ADD COLUMN IF NOT EXISTS options jsonb;
 
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id   ON order_items (order_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items (product_id);

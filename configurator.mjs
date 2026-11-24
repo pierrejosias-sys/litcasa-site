@@ -232,10 +232,13 @@ export function priceFor(p, opts) {
   // their set, so normalize by the default size's factor: the default
   // configuration always shows exactly the CSV typical price, and other
   // sizes scale proportionally from there. Result is still typical.
+  // Integer cents throughout: avoids float artifacts (e.g. 89.99 x 1.5
+  // landing a cent low). Same math as scaledUnitPriceCents() in
+  // api/_lib/options.js — the two must always agree.
   const sizes = sizesFor(p);
   const baseFactor = sizes[p.defaultSize ?? 0]?.factor ?? 1;
   const factor = (opts?.sizeFactor ?? 1) / baseFactor;
-  return Math.round(p.price * factor * 100) / 100;
+  return Math.round(Math.round(p.price * 100) * factor) / 100;
 }
 export function money(n) { return '$' + n.toFixed(2); }
 export function summaryText(p, opts) {

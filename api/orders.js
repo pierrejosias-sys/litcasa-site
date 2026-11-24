@@ -6,11 +6,24 @@
  * POST — create an order (checkout, before payment).
  *   Body: {
  *     customer: { name, email, phone? },
- *     items: [{ product_id, quantity }],
+ *     items: [{ product_id, quantity, options? }],
  *     shipping_address: string | object
  *   }
  *   - Validates everything server-side; client-supplied prices or
  *     totals are NEVER trusted — totals are computed from DB prices.
+ *   - options (per line) are the configurator options
+ *     { color, size, brightness, finish?, customText? } — see
+ *     ./_lib/options.js. They are NORMALIZED server-side (unknown
+ *     values dropped) and the unit price is recomputed from the DB
+ *     base price scaled by the size factor, so a configured line
+ *     (e.g. a 36in chandelier) is priced at its size-scaled typical
+ *     price. Two lines for the same product with DIFFERENT options
+ *     are kept as separate lines; an exact duplicate (same product
+ *     + same options) is rejected. Normalized options are stored on
+ *     order_items.options (jsonb) when that column exists — see
+ *     hasOptionsColumn() in ./_lib/options.js; until the schema
+ *     migration has been run, orders still work and only the
+ *     options detail is not persisted.
  *   - Shipping is a flat $0 placeholder for now: shipping is TBD
  *     (no supplier shipping / duty cost confirmed yet), so
  *     shipping_cents = 0 and the response flags shipping_status
@@ -35,6 +48,12 @@
  */
 
 const { sql, assertDbConfigured, getDailyOrderId, withTransaction } = require('./_lib/db');
+const {
+  normalizeOptions,
+  scaledUnitPriceCents,
+  optionsKey,
+  hasOptionsColumn,
+} = require('./_lib/options');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -94,6 +113,8 @@ function publicOrder(order, items) {
       unit_price_dollars: toDollars(it.unit_price_cents),
       line_total_cents: it.line_total_cents,
       line_total_dollars: toDollars(it.line_total_cents),
+      // Configurator options for this line (null = plain add).
+      options: it.options ?? null,
     })),
   };
 }
@@ -116,11 +137,18 @@ async function handleGet(req, res) {
     return;
   }
 
-  const { rows: items } = await sql`
-    SELECT product_id, product_name, quantity,
-           unit_price_cents, line_total_cents
-    FROM order_items WHERE order_id = ${id} ORDER BY id ASC
-  `;
+  const optionsSupported = await hasOptionsColumn(sql);
+  const { rows: items } = optionsSupported
+    ? await sql`
+        SELECT product_id, product_name, quantity,
+               unit_price_cents, line_total_cents, options
+        FROM order_items WHERE order_id = ${id} ORDER BY id ASC
+      `
+    : await sql`
+        SELECT product_id, product_name, quantity,
+               unit_price_cents, line_total_cents
+        FROM order_items WHERE order_id = ${id} ORDER BY id ASC
+      `;
   sendJson(res, 200, { order: publicOrder(rows[0], items) });
 }
 
@@ -161,7 +189,7 @@ async function handlePost(req, res) {
   const seen = new Set();
   for (const item of items) {
     if (!item || typeof item !== 'object' || Array.isArray(item)) {
-      sendJson(res, 400, { error: 'Each item must be { product_id, quantity }.' });
+      sendJson(res, 400, { error: 'Each item must be { product_id, quantity, options? }.' });
       return;
     }
     if (typeof item.product_id !== 'string' || !item.product_id.trim()) {
@@ -172,13 +200,24 @@ async function handlePost(req, res) {
       sendJson(res, 400, { error: 'Each item quantity must be an integer >= 1.' });
       return;
     }
-    // Merge duplicate product lines so the same product is not
-    // charged twice as two rows.
-    if (seen.has(item.product_id.trim())) {
-      sendJson(res, 400, { error: 'Duplicate product_id in items: ' + item.product_id.trim() });
+    // options, when present, must be a plain object — it is
+    // normalized per product below (unknown values are dropped).
+    if (
+      item.options !== undefined &&
+      item.options !== null &&
+      (typeof item.options !== 'object' || Array.isArray(item.options))
+    ) {
+      sendJson(res, 400, { error: 'Each item options must be an object when present.' });
       return;
     }
-    seen.add(item.product_id.trim());
+    // Same product with DIFFERENT options is a separate line; an
+    // exact duplicate (same product + same options) is rejected.
+    const key = item.product_id.trim() + '|' + optionsKey(normalizeOptions(item.product_id.trim(), item.options));
+    if (seen.has(key)) {
+      sendJson(res, 400, { error: 'Duplicate line in items: ' + item.product_id.trim() });
+      return;
+    }
+    seen.add(key);
   }
 
   // ---- Validate shipping address ----
@@ -213,21 +252,31 @@ async function handlePost(req, res) {
   }
 
   // ---- Compute totals from DB prices (integer cents only) ----
+  // Unit price is the DB base price scaled by the line's configurator
+  // size factor (server-side — a client-supplied price is never used).
   const lines = items.map((item) => {
     const p = byId.get(item.product_id.trim());
-    const lineTotal = p.price_cents * item.quantity;
+    const options = normalizeOptions(p.id, item.options);
+    const unitPrice = scaledUnitPriceCents(p.price_cents, p.id, options);
+    const lineTotal = unitPrice * item.quantity;
     return {
       product_id: p.id,
       product_name: p.name,
       quantity: item.quantity,
-      unit_price_cents: p.price_cents,
+      unit_price_cents: unitPrice,
       line_total_cents: lineTotal,
+      options,
     };
   });
   const subtotalCents = lines.reduce((sum, l) => sum + l.line_total_cents, 0);
   // SHIPPING TBD — flat $0 placeholder. See header comment.
   const shippingCents = 0;
   const totalCents = subtotalCents + shippingCents;
+
+  // Does the live DB have the order_items.options column yet?
+  // (schema.sql adds it; until that migration is run, orders still
+  // work and only the options detail is not persisted.)
+  const optionsSupported = await hasOptionsColumn(sql);
 
   // ---- Write everything in one transaction ----
   const orderId = await withTransaction(async (tx) => {
@@ -244,14 +293,26 @@ async function handlePost(req, res) {
     `;
 
     for (const line of lines) {
-      await tx`
-        INSERT INTO order_items
-          (order_id, product_id, product_name, quantity,
-           unit_price_cents, line_total_cents)
-        VALUES (${id}, ${line.product_id}, ${line.product_name},
-                ${line.quantity}, ${line.unit_price_cents},
-                ${line.line_total_cents})
-      `;
+      if (optionsSupported) {
+        await tx`
+          INSERT INTO order_items
+            (order_id, product_id, product_name, quantity,
+             unit_price_cents, line_total_cents, options)
+          VALUES (${id}, ${line.product_id}, ${line.product_name},
+                  ${line.quantity}, ${line.unit_price_cents},
+                  ${line.line_total_cents},
+                  ${line.options ? JSON.stringify(line.options) : null}::jsonb)
+        `;
+      } else {
+        await tx`
+          INSERT INTO order_items
+            (order_id, product_id, product_name, quantity,
+             unit_price_cents, line_total_cents)
+          VALUES (${id}, ${line.product_id}, ${line.product_name},
+                  ${line.quantity}, ${line.unit_price_cents},
+                  ${line.line_total_cents})
+        `;
+      }
     }
 
     // Upsert the customer by email (customers.email is UNIQUE).

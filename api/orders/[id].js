@@ -17,6 +17,7 @@
  */
 
 const { sql, assertDbConfigured } = require('../_lib/db');
+const { hasOptionsColumn } = require('../_lib/options');
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -84,11 +85,18 @@ module.exports = async (req, res) => {
       return;
     }
 
-    const { rows: items } = await sql`
-      SELECT product_id, product_name, quantity,
-             unit_price_cents, line_total_cents
-      FROM order_items WHERE order_id = ${id} ORDER BY id ASC
-    `;
+    const optionsSupported = await hasOptionsColumn(sql);
+    const { rows: items } = optionsSupported
+      ? await sql`
+          SELECT product_id, product_name, quantity,
+                 unit_price_cents, line_total_cents, options
+          FROM order_items WHERE order_id = ${id} ORDER BY id ASC
+        `
+      : await sql`
+          SELECT product_id, product_name, quantity,
+                 unit_price_cents, line_total_cents
+          FROM order_items WHERE order_id = ${id} ORDER BY id ASC
+        `;
 
     const order = rows[0];
     sendJson(res, 200, {
@@ -118,6 +126,8 @@ module.exports = async (req, res) => {
           unit_price_dollars: toDollars(it.unit_price_cents),
           line_total_cents: it.line_total_cents,
           line_total_dollars: toDollars(it.line_total_cents),
+          // Configurator options for this line (null = plain add).
+          options: it.options ?? null,
         })),
       },
     });

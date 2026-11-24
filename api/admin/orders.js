@@ -10,7 +10,8 @@
  *                payment_provider, stripe_session_id, created_at,
  *                updated_at, item_count, items: [{ product_id,
  *                product_name, quantity, unit_price_cents,
- *                line_total_cents }] }] }
+ *                line_total_cents, options }] }] }
+ *   options is the line's configurator options (null = plain add).
  *
  * Auth: header `x-admin-key` OR query `?key=`, equal to
  * process.env.ADMIN_PASSWORD. Compared with crypto.timingSafeEqual
@@ -28,6 +29,7 @@
 
 const crypto = require('crypto');
 const { sql, assertDbConfigured } = require('../_lib/db');
+const { hasOptionsColumn } = require('../_lib/options');
 
 function sendJson(res, status, body) {
   res.statusCode = status;
@@ -104,13 +106,22 @@ module.exports = async (req, res) => {
     }
 
     const orderIds = orders.map((o) => o.id);
-    const { rows: items } = await sql`
-      SELECT order_id, product_id, product_name, quantity,
-             unit_price_cents, line_total_cents
-      FROM order_items
-      WHERE order_id = ANY(${orderIds})
-      ORDER BY order_id, id ASC
-    `;
+    const optionsSupported = await hasOptionsColumn(sql);
+    const { rows: items } = optionsSupported
+      ? await sql`
+          SELECT order_id, product_id, product_name, quantity,
+                 unit_price_cents, line_total_cents, options
+          FROM order_items
+          WHERE order_id = ANY(${orderIds})
+          ORDER BY order_id, id ASC
+        `
+      : await sql`
+          SELECT order_id, product_id, product_name, quantity,
+                 unit_price_cents, line_total_cents
+          FROM order_items
+          WHERE order_id = ANY(${orderIds})
+          ORDER BY order_id, id ASC
+        `;
 
     const itemsByOrder = new Map();
     for (const item of items) {
@@ -123,6 +134,8 @@ module.exports = async (req, res) => {
         unit_price_dollars: toDollars(item.unit_price_cents),
         line_total_cents: item.line_total_cents,
         line_total_dollars: toDollars(item.line_total_cents),
+        // Configurator options for this line (null = plain add).
+        options: item.options ?? null,
       });
     }
 
