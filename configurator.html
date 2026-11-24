@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="color-scheme" content="light dark"/>
+<link rel="icon" href="data:,"/>
+<title>View in 3D — LitCasa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFBF2; --surface:#FFFFFF; --surface2:#FFF4DC; --ink:#16130E; --muted:#6B6252; --line:#EADFC8;
+  --amber:#FFB800; --amber2:#FF8A00; --teal:#0E9A7A; --card:#FFFFFF; --chip:#FFF1CC; --shadow:0 10px 30px rgba(22,19,14,.08); --radius:18px;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#12100C; --surface:#1C1913; --surface2:#242017; --ink:#FFF8E6; --muted:#C9B99A; --line:#332D1F; --card:#1C1913; --chip:#2E2716; --shadow:0 10px 30px rgba(0,0,0,.35); }
+}
+*{box-sizing:border-box} body{margin:0;font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+a{color:inherit;text-decoration:none} button,input,select{font:inherit;min-height:44px}
+.mono{font-family:JetBrains Mono,monospace}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.topbar{background:#16130E;color:#FFD34D;text-align:center;padding:9px 16px;font-size:13px;font-weight:700;letter-spacing:.02em}
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--bg) 92%, transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.head{display:flex;align-items:center;gap:16px;padding:14px 0;flex-wrap:wrap}
+.logo{font-family:Archivo,sans-serif;font-weight:900;font-size:28px;letter-spacing:-.03em;line-height:1}
+.logo i{font-style:normal;color:var(--amber2)} .logo small{display:block;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:.22em;font-weight:700;color:var(--muted);margin-top:3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:0 20px;font-weight:800;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+.btn-amber{background:var(--amber);color:#1A1405;border-color:var(--amber)} .btn-amber:hover{background:#FFC933}
+.btn-dark{background:var(--ink);color:var(--bg)} .btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn-sm{min-height:38px;padding:0 14px;font-size:14px}
+h1,h2,h3{font-family:Archivo,sans-serif;line-height:.95;letter-spacing:-.02em;margin:0}
+main{padding:22px 0 60px}
+.crumb{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px}
+.crumb a{text-decoration:underline}
+.cfg{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:start}
+.viewer{background:#14100C;border:1px solid var(--line);border-radius:24px;overflow:hidden;position:relative}
+#scene{width:100%;height:520px;display:block;touch-action:none}
+.viewer-bar{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;pointer-events:none}
+.viewer-bar>*{pointer-events:auto}
+.hint{background:rgba(18,16,12,.85);color:#FFF8E6;font-size:12px;font-weight:700;padding:8px 12px;border-radius:999px}
+.chipbtn{background:rgba(255,255,255,.92);color:#111;border:0;border-radius:999px;padding:0 14px;font-weight:800;font-size:13px;cursor:pointer;min-height:38px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
+.cat{font-family:JetBrains Mono,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.panel h1{font-size:clamp(26px,3.5vw,34px);margin:8px 0 6px;line-height:1.05}
+.panel p.desc{color:var(--muted);margin:0 0 14px;font-size:15px}
+.homekit{display:inline-flex;align-items:center;gap:6px;background:#EAF2FF;color:#0B3D91;border:1px solid #B9D2F5;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;margin:0 0 12px}
+@media (prefers-color-scheme: dark){.homekit{background:#1B2A44;color:#B9D2F5;border-color:#2C4A7A}}
+.field{margin-bottom:16px} .field>label{display:block;font-weight:800;font-size:13px;margin-bottom:8px}
+.field select{width:100%;border:1px solid var(--line);border-radius:12px;padding:0 14px;background:var(--bg);color:var(--ink)}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:44px;height:44px;min-height:44px;border-radius:50%;border:3px solid transparent;cursor:pointer;padding:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.swatch[aria-pressed="true"]{border-color:var(--ink);outline:3px solid var(--amber)}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pillbtn{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:0 16px;font-weight:800;cursor:pointer;font-size:14px}
+.pillbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--amber2);min-height:44px}
+.range-val{font-family:JetBrains Mono,monospace;font-weight:700;font-size:13px}
+.field input[type=text]{width:100%;border:1px solid var(--line);border-radius:12px;padding:0 14px;background:var(--bg);color:var(--ink)}
+.summary{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:14px;margin-bottom:14px}
+.summary b{display:block;font-size:13px;margin-bottom:4px}
+.price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.price{font-family:Archivo,sans-serif;font-size:30px;font-weight:900}
+.typical-note{font-size:12px;color:var(--muted);margin:0 0 14px}
+.cta-row{display:flex;gap:8px;flex-wrap:wrap}
+.cta-row .btn{flex:1;min-width:160px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:#16130E;color:#fff;padding:12px 18px;border-radius:999px;font-weight:800;z-index:200;display:none;box-shadow:var(--shadow);max-width:92vw;text-align:center}
+.toast.show{display:block}
+.note{font-size:13px;background:#FFF3C4;border:1px solid #FFE08A;color:#5C4300;border-radius:12px;padding:10px 12px;margin-top:14px;font-weight:600}
+@media (prefers-color-scheme: dark){.note{background:#2E2716;color:#FFD34D;border-color:#4A3F1E}}
+footer{border-top:1px solid var(--line);padding:28px 0 60px;color:var(--muted);font-size:13px}
+.noscript{padding:16px;background:#FFF3C4;color:#5C4300;border-radius:12px;font-weight:700;margin-bottom:12px}
+@media(max-width:900px){.cfg{grid-template-columns:1fr}#scene{height:420px}}
+@media(max-width:560px){#scene{height:340px}.panel{padding:18px}}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div class="topbar">3D PREVIEW — PROCEDURAL MODEL · TYPICAL PRICES SHOWN* <span>· Confirm real prices &amp; specs when your supplier is connected</span></div>
+<header><div class="wrap head">
+  <a href="index.html" class="logo">LIT<i>CASA</i><small>EVERYTHING LED</small></a>
+  <div style="margin-left:auto;display:flex;gap:8px">
+    <a class="btn btn-ghost btn-sm" href="index.html">← Back to shop</a>
+    <a class="btn btn-dark btn-sm" href="index.html#shop">View cart →</a>
+  </div>
+</div></header>
+<main><div class="wrap">
+  <div class="crumb"><a href="index.html">LitCasa</a> / <a href="index.html#shop">Shop</a> / <span id="crumbName">3D configurator</span></div>
+  <noscript><div class="noscript">This 3D preview needs JavaScript enabled. You can still shop the full catalog on the <a href="index.html">main store page</a>.</div></noscript>
+  <div class="cfg">
+    <div class="viewer">
+      <canvas id="scene" aria-label="3D preview — drag to rotate, pinch or scroll to zoom"></canvas>
+      <div class="viewer-bar">
+        <span class="hint">Drag to rotate · Pinch / scroll to zoom · Two-finger drag to pan</span>
+        <button class="chipbtn" id="spinBtn" type="button" aria-pressed="true">⟳ Auto-rotate: on</button>
+      </div>
+    </div>
+    <section class="panel" aria-label="Configure this product">
+      <div class="cat" id="pCat">—</div>
+      <h1 id="pName">Loading…</h1>
+      <p class="desc" id="pDesc"></p>
+      <div id="homekitSlot"></div>
+      <div class="field">
+        <label for="productSel">Product</label>
+        <select id="productSel" aria-label="Choose a product"></select>
+      </div>
+      <div class="field" id="colorField">
+        <label id="colorLabel">Light color</label>
+        <div class="swatches" id="swatches" role="group" aria-labelledby="colorLabel"></div>
+        <div class="range-val" id="colorName" style="margin-top:8px"></div>
+      </div>
+      <div class="field" id="finishField" hidden>
+        <label id="finishLabel">Finish</label>
+        <div class="pills" id="finishPills" role="group" aria-labelledby="finishLabel"></div>
+      </div>
+      <div class="field" id="sizeField">
+        <label id="sizeLabel">Size / length</label>
+        <div class="pills" id="sizePills" role="group" aria-labelledby="sizeLabel"></div>
+      </div>
+      <div class="field" id="textField" hidden>
+        <label for="customText">Your neon text (preview only — exact wording is confirmed at checkout)</label>
+        <input type="text" id="customText" maxlength="24" placeholder="e.g. Good Vibes" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="brightness">Brightness — <span class="range-val" id="brightVal">80%</span></label>
+        <input type="range" id="brightness" min="10" max="100" step="5" value="80" aria-label="Brightness">
+      </div>
+      <div class="summary"><b>Your configuration</b><span id="summaryText">—</span></div>
+      <div class="price-row"><span class="price" id="priceText">$0.00</span><span class="mono" style="font-size:12px;font-weight:700">Typical price*</span></div>
+      <p class="typical-note">*Typical price — a placeholder, not a real supplier price. Size may scale the typical price proportionally; the scaled figure is still typical.</p>
+      <div class="cta-row">
+        <button class="btn btn-amber" id="addBtn" type="button">Add to cart</button>
+        <a class="btn btn-ghost" href="index.html#shop">Continue shopping</a>
+      </div>
+      <div class="note">3D model is a procedural preview (shape, glow &amp; proportions), not a photo of the exact supplier unit. Check the product specs on the main store page before ordering.</div>
+    </section>
+  </div>
+</div></main>
+<footer><div class="wrap">LitCasa — Everything LED · 3D configurator · Models are procedural previews. All prices shown are “Typical price*” placeholders until supplier prices are connected. No analytics, no tracking, no backend calls on this page.</div></footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { PRODUCTS, CART_KEY, resolveProductId, getProduct, colorsFor, sizesFor, finishesFor, defaultOptions, priceFor, money, summaryText } from './configurator.mjs';
+
+const $ = s => document.querySelector(s);
+const canvas = $('#scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x14100c);
+scene.fog = new THREE.Fog(0x14100c, 9, 18);
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+camera.position.set(3.4, 2.2, 4.6);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 1.6; controls.maxDistance = 10;
+controls.maxPolarAngle = Math.PI * 0.92;
+controls.autoRotate = true; controls.autoRotateSpeed = 0.9;
+controls.target.set(0, 0.9, 0);
+scene.add(new THREE.AmbientLight(0xfff2dd, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(4, 6, 3); scene.add(key);
+const fill = new THREE.DirectionalLight(0xbfd4ff, 0.35); fill.position.set(-4, 3, -2); scene.add(fill);
+const glowLight = new THREE.PointLight(0xffd9a0, 12, 9, 1.6); glowLight.position.set(0, 1.6, 1.2); scene.add(glowLight);
+// Floor: dark disc + faint ring, so models sit in a studio, not in void.
+const floor = new THREE.Mesh(new THREE.CircleGeometry(3.4, 48),
+  new THREE.MeshStandardMaterial({ color: 0x221c14, roughness: 0.9, metalness: 0.05 }));
+floor.rotation.x = -Math.PI / 2; floor.position.y = 0; scene.add(floor);
+const ring = new THREE.Mesh(new THREE.RingGeometry(3.4, 3.46, 48),
+  new THREE.MeshBasicMaterial({ color: 0xffb800, side: THREE.DoubleSide }));
+ring.rotation.x = -Math.PI / 2; ring.position.y = 0.001; scene.add(ring);
+
+let modelGroup = null;
+let current = getProduct(new URLSearchParams(location.search).get('p'));
+let opts = defaultOptions(current);
+
+// ---- material helpers (procedural only, no textures except canvas text) ----
+function glowMat(hex, intensity = 1.6) {
+  const m = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: new THREE.Color(hex), emissiveIntensity: intensity, roughness: 0.35, metalness: 0.05 });
+  m.userData.glowBase = intensity; return m;
+}
+function std(color, rough = 0.6, metal = 0.15) {
+  return new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
+}
+function glass(color = 0xdddddd, opacity = 0.35) {
+  return new THREE.MeshPhysicalMaterial({ color, roughness: 0.08, metalness: 0, transparent: true, opacity, transmission: 0.4, thickness: 0.05 });
+}
+function mesh(geo, mat, x = 0, y = 0, z = 0) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); return m; }
+function glowMesh(geo, hex, x = 0, y = 0, z = 0, intensity = 1.6) {
+  const m = mesh(geo, glowMat(hex, intensity), x, y, z); m.userData.isGlow = true; return m;
+}
+function textPlane(text, hex) {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 256;
+  const g = c.getContext('2d'); g.clearRect(0, 0, 1024, 256);
+  g.font = '900 150px Archivo, Manrope, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.shadowColor = hex; g.shadowBlur = 42; g.fillStyle = hex;
+  g.fillText((text || 'Good Vibes').slice(0, 24), 512, 132);
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.65),
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide }));
+  m.userData.isGlow = true; return m;
+}
+function bulbSmall(hex, x, y, z, r = 0.09) { return glowMesh(new THREE.SphereGeometry(r, 20, 16), hex, x, y, z, 2.0); }
+function addBulbRow(group, hex, count, y, radius, r = 0.09) {
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2;
+    group.add(bulbSmall(hex, Math.cos(a) * radius, y, Math.sin(a) * radius, r));
+  }
+}
+function catenaryPoints(n, width, sag) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, x = (t - 0.5) * width;
+    pts.push(new THREE.Vector3(x, 2.3 - sag * (1 - Math.pow(2 * t - 1, 2)), 0));
+  }
+  return pts;
+}
+
+// ---- 20 parametric builders. Each returns a THREE.Group, ~1.8 units tall, base at y=0. ----
+const BUILDERS = {
+  strip(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    if (p.variant === 'tv') { // rectangle frame (TV backlight)
+      const w = 2.2 * s, h = 1.3;
+      const frame = new THREE.Group();
+      const mk = (len, x, y, rz) => { const b = glowMesh(new THREE.BoxGeometry(len, 0.07, 0.05), hex, x, y, 0, 1.8); b.rotation.z = rz; frame.add(b); };
+      mk(w, 0, h / 2, 0); mk(w, 0, -h / 2, 0); mk(h, -w / 2, 0, Math.PI / 2); mk(h, w / 2, 0, Math.PI / 2);
+      frame.position.y = 1.0; g.add(frame);
+      g.add(mesh(new THREE.BoxGeometry(2.0 * s, 1.15, 0.04), std(0x0d0d0d, 0.4, 0.3), 0, 1.0, -0.06));
+      g.add(mesh(new THREE.BoxGeometry(0.3, 0.12, 0.08), std(0x222222), 0.9 * s, 0.12, 0.05));
+      return g;
+    }
+    if (p.variant === 'mirror') { // rectangle frame of small globes (Hollywood strip)
+      const w = 1.9 * s, h = 1.25, per = Math.max(4, Math.round(6 * s));
+      const top = catenaryPoints(0, 0, 0); void top;
+      for (let i = 0; i < per; i++) { const t = i / (per - 1); g.add(bulbSmall(hex, (t - 0.5) * w, 1.65, 0, 0.07)); g.add(bulbSmall(hex, (t - 0.5) * w, 0.4, 0, 0.07)); }
+      for (let i = 1; i < 4; i++) { const t = i / 4; g.add(bulbSmall(hex, -w / 2, 0.4 + t * 1.25, 0, 0.07)); g.add(bulbSmall(hex, w / 2, 0.4 + t * 1.25, 0, 0.07)); }
+      g.add(mesh(new THREE.BoxGeometry(w, h, 0.03), glass(0xcfe8ff, 0.22), 0, 1.02, -0.05));
+      return g;
+    }
+    // coil / car / underglow: glowing ribbon wound in a loose spiral
+    const turns = p.variant === 'underglow' ? 2 : 3, pts = [];
+    for (let i = 0; i <= 140; i++) {
+      const t = i / 140, a = t * Math.PI * 2 * turns, r = 0.95 * s * (1 - t * 0.25);
+      pts.push(new THREE.Vector3(Math.cos(a) * r, 0.25 + t * 1.35, Math.sin(a) * r));
+    }
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 220, 0.045, 8), glowMat(hex, 1.9));
+    tube.userData.isGlow = true; g.add(tube);
+    const ctrl = mesh(new THREE.BoxGeometry(0.34, 0.1, 0.2), std(0x1c1c1c, 0.5, 0.2), 0.95 * s, 0.12, 0.1); g.add(ctrl);
+    g.add(glowMesh(new THREE.SphereGeometry(0.035, 12, 8), hex, 0.95 * s, 0.19, 0.1, 2.2));
+    if (p.variant === 'underglow') { // flat car silhouette hint: low wide bar under the coil
+      g.add(mesh(new THREE.BoxGeometry(2.0 * s, 0.08, 0.5), std(0x111111, 0.4, 0.4), 0, 0.06, 0));
+    }
+    return g;
+  },
+  bulb(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    const n = p.variant === 'edison' ? 1 : 1;
+    void n;
+    const glassGeo = p.variant === 'edison'
+      ? new THREE.SphereGeometry(0.42 * s, 32, 24) : new THREE.SphereGeometry(0.5 * s, 32, 24);
+    const globe = new THREE.Mesh(glassGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: new THREE.Color(hex), emissiveIntensity: 1.4, roughness: 0.15, metalness: 0, transparent: true, opacity: 0.92 }));
+    globe.userData.isGlow = true; globe.scale.y = p.variant === 'edison' ? 1.35 : 1.15; globe.position.y = 1.25; g.add(globe);
+    if (p.variant === 'edison') { // filament zig-zag
+      const pts = []; for (let i = 0; i <= 10; i++) pts.push(new THREE.Vector3((i % 2 ? 0.14 : -0.14) * s, 0.95 + i * 0.06, 0));
+      const fil = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, 0.015, 6), glowMat('#FFB45E', 2.4));
+      fil.userData.isGlow = true; g.add(fil);
+    }
+    const base = mesh(new THREE.CylinderGeometry(0.22 * s, 0.24 * s, 0.42, 24), std(0xB8B8B8, 0.35, 0.9), 0, 0.62, 0);
+    g.add(base);
+    for (let i = 0; i < 3; i++) { const ring = mesh(new THREE.TorusGeometry(0.23 * s, 0.018, 8, 24), std(0x8a8a8a, 0.4, 0.9), 0, 0.5 + i * 0.12, 0); ring.rotation.x = Math.PI / 2; g.add(ring); }
+    g.add(mesh(new THREE.CylinderGeometry(0.1 * s, 0.1 * s, 0.08, 16), std(0x888888, 0.4, 0.9), 0, 0.38, 0));
+    return g;
+  },
+  neon(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    g.add(mesh(new THREE.BoxGeometry(2.4 * s, 1.5, 0.05), new THREE.MeshStandardMaterial({ color: 0x0e0e12, roughness: 0.85 }), 0, 1.05, -0.08));
+    if (p.variant === 'rope') { // coiled neon rope
+      const pts = []; for (let i = 0; i <= 120; i++) { const t = i / 120, a = t * Math.PI * 2 * 3; pts.push(new THREE.Vector3(Math.cos(a) * 0.85 * s, 0.3 + t * 1.3, Math.sin(a) * 0.85 * s)); }
+      const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 200, 0.05, 8), glowMat(hex, 2.0));
+      tube.userData.isGlow = true; g.add(tube); return g;
+    }
+    // script / custom: glowing wave tube + text plane
+    const pts = []; for (let i = 0; i <= 60; i++) { const t = i / 60; pts.push(new THREE.Vector3((t - 0.5) * 2.1 * s, 1.35 + Math.sin(t * Math.PI * 3) * 0.16, 0)); }
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 120, 0.045, 8), glowMat(hex, 2.1));
+    tube.userData.isGlow = true; g.add(tube);
+    const tp = textPlane(p.variant === 'custom' ? (o.customText || 'Good Vibes') : 'Good Vibes', hex);
+    tp.position.set(0, 0.85, 0); tp.scale.setScalar(s); g.add(tp);
+    g.add(mesh(new THREE.BoxGeometry(0.3, 0.1, 0.12), std(0x222222), 0.9 * s, 0.18, 0));
+    return g;
+  },
+  string(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    const pts = catenaryPoints(48, 3.0 * s, 0.85);
+    const wire = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 96, 0.012, 6), std(0x2a2118, 0.8, 0));
+    g.add(wire);
+    const count = p.variant === 'fairy' ? 26 : 12;
+    for (let i = 0; i < count; i++) {
+      const t = (i + 0.5) / count, pt = new THREE.CatmullRomCurve3(pts).getPoint(t);
+      const r = p.variant === 'fairy' ? 0.035 : 0.11;
+      g.add(glowMesh(new THREE.SphereGeometry(r, 16, 12), hex, pt.x, pt.y - r - 0.03, pt.z, 2.0));
+      if (p.variant !== 'fairy') g.add(mesh(new THREE.CylinderGeometry(0.03, 0.045, 0.07, 10), std(0x333333), pt.x, pt.y - 0.02, pt.z));
+    }
+    g.add(mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.5, 8), std(0x3a2c1c), -1.5 * s, 2.55, 0));
+    g.add(mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.5, 8), std(0x3a2c1c), 1.5 * s, 2.55, 0));
+    return g;
+  },
+  panel(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    if (p.variant === 'hex') {
+      const hexGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.06, 6);
+      const layout = [[0, 1.15, 0], [-0.38, 0.75, 0], [0.38, 0.75, 0], [-0.38, 1.55, 0], [0.38, 1.55, 0], [0, 0.35, 0], [0, 1.95, 0]];
+      layout.slice(0, Math.round(4 + 3 * s)).forEach(([x, y]) => {
+        const tile = mesh(hexGeo, std(0x181818, 0.5, 0.2), x, y, 0); tile.rotation.x = Math.PI / 2; tile.rotation.z = Math.PI / 6; g.add(tile);
+        const face = glowMesh(new THREE.CylinderGeometry(0.36, 0.36, 0.02, 6), hex, x, y, 0.035, 1.7); face.rotation.x = Math.PI / 2; face.rotation.z = Math.PI / 6; g.add(face);
+      });
+      return g;
+    }
+    const w = 2.0 * s, h = 1.1;
+    g.add(mesh(new THREE.BoxGeometry(w, h, 0.06), std(0xE8E8E8, 0.4, 0.4), 0, 1.05, 0));
+    const face = glowMesh(new THREE.BoxGeometry(w - 0.12, h - 0.12, 0.02), hex, 0, 1.05, 0.04, 1.5); g.add(face);
+    g.add(mesh(new THREE.BoxGeometry(0.5, 0.08, 0.1), std(0x333333), 0, 0.42, 0));
+    return g;
+  },
+  outdoor(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    if (p.variant === 'pathway') {
+      for (let i = 0; i < 3; i++) {
+        const x = (i - 1) * 0.9 * s;
+        g.add(mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.7, 12), std(0x222222, 0.6, 0.3), x, 0.35, 0));
+        g.add(mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.12, 16), std(0x1a1a1a, 0.5, 0.3), x, 0.75, 0));
+        g.add(glowMesh(new THREE.SphereGeometry(0.13, 18, 12), hex, x, 0.88, 0, 1.9));
+      }
+      return g;
+    }
+    if (p.variant === 'spot') {
+      for (let i = 0; i < 2; i++) {
+        const x = (i - 0.5) * 1.1 * s;
+        const head = new THREE.Group();
+        head.add(mesh(new THREE.CylinderGeometry(0.22, 0.26, 0.35, 20), std(0x1c1c1c, 0.5, 0.4), 0, 0, 0));
+        head.add(glowMesh(new THREE.CircleGeometry(0.19, 20), hex, 0, 0.18, 0.02, 2.0));
+        head.rotation.x = -0.6; head.position.set(x, 0.55, 0); g.add(head);
+        g.add(mesh(new THREE.CylinderGeometry(0.05, 0.08, 0.35, 10), std(0x222222), x, 0.18, 0));
+      }
+      return g;
+    }
+    if (p.variant === 'lightbar') { // long bar + lens row
+      const w = 2.1 * s;
+      g.add(mesh(new THREE.BoxGeometry(w, 0.28, 0.22), std(0x141414, 0.4, 0.6), 0, 1.0, 0));
+      for (let i = 0; i < 7; i++) g.add(glowMesh(new THREE.CylinderGeometry(0.09, 0.09, 0.05, 16), hex, (i - 3) * 0.27 * s, 1.0, 0.12, 2.0)).children;
+      g.children.slice(-7).forEach(m => { m.rotation.x = Math.PI / 2; });
+      g.add(mesh(new THREE.BoxGeometry(0.3, 0.18, 0.3), std(0x222222), -w / 2, 0.8, 0));
+      g.add(mesh(new THREE.BoxGeometry(0.3, 0.18, 0.3), std(0x222222), w / 2, 0.8, 0));
+      return g;
+    }
+    // flood: yoke + rectangular head
+    g.add(mesh(new THREE.BoxGeometry(0.5, 0.08, 0.5), std(0x222222), 0, 0.04, 0));
+    const head = new THREE.Group();
+    head.add(mesh(new THREE.BoxGeometry(0.9 * s, 0.7, 0.18), std(0x1a1a1a, 0.45, 0.5), 0, 0, 0));
+    head.add(glowMesh(new THREE.BoxGeometry(0.78 * s, 0.58, 0.03), hex, 0, 0, 0.1, 1.8));
+    head.position.set(0, 1.0, 0); head.rotation.x = -0.25; g.add(head);
+    g.add(mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.5, 10), std(0x333333), 0, 0.55, 0));
+    return g;
+  },
+  headlight(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex;
+    for (let i = 0; i < 2; i++) {
+      const x = (i - 0.5) * 1.0, b = new THREE.Group();
+      b.add(mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.55, 20), std(0xC0C0C0, 0.35, 0.9), 0, 0.9, 0));
+      for (let f = 0; f < 6; f++) { const fin = mesh(new THREE.BoxGeometry(0.34, 0.02, 0.3), std(0x888888, 0.4, 0.9), 0, 0.75 + f * 0.07, 0); fin.rotation.y = f * 0.5; b.add(fin); }
+      b.add(glowMesh(new THREE.SphereGeometry(0.13, 18, 12), hex, 0, 1.28, 0, 2.2));
+      b.add(mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.2, 12), std(0x222222), 0, 0.55, 0));
+      b.position.x = x; g.add(b);
+    }
+    return g;
+  },
+  grow(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    if (p.variant === 'clip') {
+      g.add(mesh(new THREE.TorusGeometry(0.28, 0.05, 10, 20, Math.PI * 1.4), std(0x222222, 0.5, 0.3), -0.7, 0.35, 0));
+      const pts = [new THREE.Vector3(-0.7, 0.6, 0), new THREE.Vector3(-0.2, 1.5, 0.2), new THREE.Vector3(0.3, 1.7, 0)];
+      g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, 0.035, 8), std(0x222222, 0.5, 0.3)));
+      for (let i = 0; i < 2; i++) {
+        const x = 0.15 + i * 0.45;
+        g.add(mesh(new THREE.CylinderGeometry(0.14, 0.17, 0.12, 16), std(0x1a1a1a), x, 1.55, 0));
+        g.add(glowMesh(new THREE.CircleGeometry(0.12, 16), hex, x, 1.49, 0, 2.0)).children;
+        g.children[g.children.length - 1].rotation.x = Math.PI / 2;
+      }
+      return g;
+    }
+    if (p.variant === 'bars') {
+      for (let i = 0; i < 3; i++) {
+        const y = 0.55 + i * 0.55;
+        g.add(mesh(new THREE.BoxGeometry(1.9 * s, 0.09, 0.16), std(0xE8E8E8, 0.4, 0.5), 0, y, 0));
+        g.add(glowMesh(new THREE.BoxGeometry(1.8 * s, 0.03, 0.1), hex, 0, y - 0.06, 0, 1.8));
+      }
+      return g;
+    }
+    // panel: flat panel + LED grid
+    g.add(mesh(new THREE.BoxGeometry(1.9 * s, 1.1, 0.08), std(0xF0F0F0, 0.4, 0.5), 0, 1.05, 0));
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++)
+      g.add(glowMesh(new THREE.CircleGeometry(0.055, 12), hex, (c - 2.5) * 0.28 * s, 0.65 + r * 0.4, 0.05, 1.9)).children;
+    g.children.slice(-18).forEach(m => { m.rotation.x = 0; });
+    g.add(mesh(new THREE.BoxGeometry(0.4, 0.1, 0.12), std(0x333333), 0, 0.42, 0));
+    return g;
+  },
+  wire(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex;
+    if (p.variant === 'spool') {
+      const coil = mesh(new THREE.TorusGeometry(0.55, 0.16, 16, 40), std(0xB03A2E, 0.6, 0.1), 0, 0.9, 0);
+      coil.rotation.x = Math.PI / 2; g.add(coil);
+      const coil2 = mesh(new THREE.TorusGeometry(0.55, 0.16, 16, 40), std(0x1F618D, 0.6, 0.1), 0, 1.05, 0);
+      coil2.rotation.x = Math.PI / 2; g.add(coil2);
+      g.add(mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.4, 20), std(0x8a6d3b, 0.7, 0), 0, 0.95, 0));
+      return g;
+    }
+    const coil = mesh(new THREE.TorusGeometry(0.6, 0.14, 16, 40), std(0x222222, 0.6, 0.1), 0, 0.9, 0);
+    coil.rotation.x = Math.PI / 2; g.add(coil);
+    for (let i = 0; i < 4; i++) {
+      const a = i * Math.PI / 2 + 0.4;
+      g.add(mesh(new THREE.BoxGeometry(0.22, 0.12, 0.12), std(0xE8E8E8, 0.5, 0.1), Math.cos(a) * 0.9, 0.25, Math.sin(a) * 0.9));
+      g.add(glowMesh(new THREE.SphereGeometry(0.03, 10, 8), hex, Math.cos(a) * 0.9, 0.33, Math.sin(a) * 0.9, 1.8));
+    }
+    return g;
+  },
+  controller(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex;
+    if (p.variant === 'dimmer') {
+      g.add(mesh(new THREE.CylinderGeometry(0.5, 0.55, 0.16, 32), std(0xF5F5F5, 0.4, 0.2), 0, 0.9, 0));
+      g.add(glowMesh(new THREE.TorusGeometry(0.32, 0.03, 10, 40), hex, 0, 0.99, 0, 1.8)).children;
+      g.children[g.children.length - 1].rotation.x = Math.PI / 2;
+      g.add(mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.06, 16), std(0x333333), 0, 1.0, 0));
+      return g;
+    }
+    g.add(mesh(new THREE.BoxGeometry(1.1, 0.55, 0.35), std(0x1E3A5F, 0.45, 0.3), 0, 0.95, 0));
+    g.add(glowMesh(new THREE.BoxGeometry(0.9, 0.08, 0.02), hex, 0, 1.12, 0.18, 1.8));
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++)
+      g.add(mesh(new THREE.BoxGeometry(0.14, 0.08, 0.02), std(c === 3 ? 0xFF5A5A : 0xE8E8E8, 0.5, 0.1), -0.33 + c * 0.22, 0.85 + r * 0.16, 0.18));
+    g.add(mesh(new THREE.BoxGeometry(0.5, 0.35, 0.06), std(0x222222, 0.5, 0.2), 0.75, 0.95, 0));
+    return g;
+  },
+  powersupply(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    g.add(mesh(new THREE.BoxGeometry(1.0 * s, 0.5, 0.6), std(0x1a1a1a, 0.5, 0.3), 0, 0.85, 0));
+    g.add(glowMesh(new THREE.SphereGeometry(0.045, 12, 8), hex, -0.35 * s, 0.95, 0.31, 2.0));
+    g.add(mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.3, 12), std(0x333333), 0.55 * s, 0.85, 0));
+    const pts = [new THREE.Vector3(0.7 * s, 0.85, 0), new THREE.Vector3(1.1 * s, 0.6, 0.3), new THREE.Vector3(0.9 * s, 0.25, 0.5)];
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 20, 0.03, 8), std(0x111111, 0.7, 0)));
+    g.add(mesh(new THREE.BoxGeometry(0.18, 0.3, 0.12), std(0x222222), -0.55 * s, 0.85, 0));
+    return g;
+  },
+};
+
+Object.assign(BUILDERS, {
+  chandelier(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    g.add(mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.9, 8), std(0x8a6d3b, 0.4, 0.8), 0, 2.0, 0));
+    g.add(mesh(new THREE.CylinderGeometry(0.16, 0.05, 0.12, 16), std(0x8a6d3b, 0.4, 0.8), 0, 2.45, 0));
+    const arms = p.variant === 'sputnik' ? 8 : 6;
+    for (let i = 0; i < arms; i++) {
+      const a = (i / arms) * Math.PI * 2;
+      const dir = p.variant === 'sputnik' ? new THREE.Vector3(Math.cos(a), (i % 2 ? 0.55 : -0.15), Math.sin(a)).normalize()
+        : new THREE.Vector3(Math.cos(a), 0.25, Math.sin(a)).normalize();
+      const len = (p.variant === 'sputnik' ? 0.95 : 0.8) * s;
+      const armEnd = dir.clone().multiplyScalar(len).add(new THREE.Vector3(0, 1.45, 0));
+      const armGeo = new THREE.CylinderGeometry(0.02, 0.02, len, 8);
+      const arm = mesh(armGeo, std(p.variant === 'farmhouse' ? 0x3a2c1c : 0xC9A227, 0.4, 0.8),
+        (armEnd.x) / 2, (1.45 + armEnd.y) / 2, armEnd.z / 2);
+      arm.lookAt(armEnd.x, armEnd.y, armEnd.z); arm.rotateX(Math.PI / 2); g.add(arm);
+      g.add(bulbSmall(hex, armEnd.x, armEnd.y + 0.08, armEnd.z, 0.08));
+      if (p.variant === 'crystal') {
+        const cry = mesh(new THREE.OctahedronGeometry(0.09), glass(0xCFE8FF, 0.5), armEnd.x * 0.75, armEnd.y - 0.12, armEnd.z * 0.75);
+        g.add(cry);
+      }
+    }
+    if (p.variant === 'crystal') {
+      g.add(mesh(new THREE.CylinderGeometry(0.55 * s, 0.35 * s, 0.22, 24), glass(0xCFE8FF, 0.45), 0, 1.35, 0));
+      for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; g.add(mesh(new THREE.OctahedronGeometry(0.06), glass(0xEAF6FF, 0.5), Math.cos(a) * 0.5 * s, 1.15, Math.sin(a) * 0.5 * s)); }
+    }
+    if (p.variant === 'farmhouse') {
+      g.add(mesh(new THREE.CylinderGeometry(0.55 * s, 0.55 * s, 0.1, 24), std(0x6B4F2A, 0.7, 0), 0, 1.4, 0));
+    }
+    g.add(mesh(new THREE.CylinderGeometry(0.1, 0.14, 0.3, 16), std(0x8a6d3b, 0.4, 0.8), 0, 1.5, 0));
+    return g;
+  },
+  pendant(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    const count = p.variant === 'cluster' ? 3 : 1;
+    const xs = count === 3 ? [-0.7, 0, 0.7] : [0];
+    xs.forEach((x, i) => {
+      const drop = count === 3 ? 1.9 - i * 0.25 : 1.9;
+      g.add(mesh(new THREE.CylinderGeometry(0.015, 0.015, drop, 6), std(0x222222), x, 1.35 + drop / 2, 0));
+      const shadeY = 1.35;
+      if (p.variant === 'dome') {
+        // Top hemisphere, unrotated: bulge up, opening down over the bulb.
+        const dome = mesh(new THREE.SphereGeometry(0.42 * s, 28, 16, 0, Math.PI * 2, 0, Math.PI / 2), glass(0x888888, 0.45), x, shadeY, 0);
+        g.add(dome);
+      } else {
+        const shade = mesh(new THREE.CylinderGeometry(0.16 * s, 0.4 * s, 0.55, 24, 1, true), glass(0xDDEEFF, 0.3), x, shadeY, 0);
+        g.add(shade);
+        const rim = mesh(new THREE.TorusGeometry(0.4 * s, 0.015, 8, 28), std(0x8a6d3b, 0.4, 0.8), x, shadeY - 0.27, 0); rim.rotation.x = Math.PI / 2; g.add(rim);
+      }
+      g.add(bulbSmall(hex, x, shadeY - 0.05, 0, 0.1));
+    });
+    g.add(mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.08, 20), std(0x222222), 0, 2.42, 0));
+    return g;
+  },
+  sconce(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    g.add(mesh(new THREE.BoxGeometry(0.06, 1.9, 0.7), std(0xD8CDB2, 0.8, 0), 0, 1.05, -0.32)); // wall hint
+    const plate = mesh(new THREE.BoxGeometry(0.08, 0.5, 0.28), std(0x2a2a2a, 0.5, 0.4), 0, 1.05, -0.26); g.add(plate);
+    if (p.variant === 'swing') {
+      const pts = [new THREE.Vector3(0, 1.15, -0.2), new THREE.Vector3(0, 1.25, 0.25), new THREE.Vector3(0, 1.05, 0.45)];
+      g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 20, 0.025, 8), std(0x8a6d3b, 0.4, 0.8)));
+      g.add(mesh(new THREE.CylinderGeometry(0.2, 0.28, 0.3, 20, 1, true), std(0xF5E6C8, 0.7, 0), 0, 0.95, 0.5));
+      g.add(bulbSmall(hex, 0, 0.9, 0.5, 0.09));
+      return g;
+    }
+    if (p.variant === 'candle') {
+      for (let i = 0; i < 2; i++) {
+        const x = (i - 0.5) * 0.45;
+        g.add(mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.4, 10), std(0xF5F0E0, 0.6, 0), x, 1.25, -0.12));
+        g.add(bulbSmall(hex, x, 1.52, -0.12, 0.07));
+        g.add(mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.08, 12), std(0x8a6d3b, 0.4, 0.8), x, 1.0, -0.12));
+      }
+      g.add(mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 8), std(0x8a6d3b, 0.4, 0.8), 0, 1.05, -0.2));
+      return g;
+    }
+    // up/down: vertical bar with glow at both ends
+    g.add(mesh(new THREE.BoxGeometry(0.16, 0.9, 0.16), std(0x1a1a1a, 0.5, 0.4), 0, 1.05, -0.18));
+    g.add(glowMesh(new THREE.ConeGeometry(0.14, 0.2, 16), hex, 0, 1.58, -0.18, 1.9));
+    const down = glowMesh(new THREE.ConeGeometry(0.14, 0.2, 16), hex, 0, 0.52, -0.18, 1.9);
+    down.rotation.x = Math.PI; g.add(down);
+    return g;
+  },
+  ceiling(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    if (p.variant === 'recessed') {
+      g.add(mesh(new THREE.CylinderGeometry(0.55 * s, 0.55 * s, 0.08, 28), std(0xF0F0F0, 0.4, 0.3), 0, 1.9, 0));
+      g.add(mesh(new THREE.CylinderGeometry(0.45 * s, 0.45 * s, 0.1, 28), std(0x222222, 0.5, 0.2), 0, 1.88, 0));
+      const face = glowMesh(new THREE.CircleGeometry(0.4 * s, 28), hex, 0, 1.82, 0, 1.7); face.rotation.x = Math.PI / 2; g.add(face);
+      g.add(mesh(new THREE.BoxGeometry(1.6, 0.06, 1.6), std(0xE8E8E8, 0.7, 0), 0, 1.98, 0)); // ceiling hint
+      return g;
+    }
+    if (p.variant === 'drum') {
+      g.add(mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.25, 12), std(0x8a6d3b, 0.4, 0.8), 0, 1.95, 0));
+      const drum = mesh(new THREE.CylinderGeometry(0.62 * s, 0.62 * s, 0.45, 28, 1, true), new THREE.MeshStandardMaterial({ color: 0xF5E6C8, roughness: 0.9, side: THREE.DoubleSide, emissive: new THREE.Color(hex), emissiveIntensity: 0.55 }), 0, 1.6, 0);
+      drum.userData.isGlow = true; drum.material.userData = { glowBase: 0.55 }; g.add(drum);
+      g.add(bulbSmall(hex, 0, 1.55, 0, 0.12));
+      return g;
+    }
+    // flush / disk
+    const r = 0.62 * s;
+    g.add(mesh(new THREE.CylinderGeometry(r, r, 0.1, 32), std(0xF0F0F0, 0.4, 0.3), 0, 1.9, 0));
+    const face = glowMesh(new THREE.CircleGeometry(r - 0.05, 32), hex, 0, 1.84, 0, 1.7); face.rotation.x = Math.PI / 2; g.add(face);
+    g.add(mesh(new THREE.BoxGeometry(1.8, 0.06, 1.8), std(0xE8E8E8, 0.7, 0), 0, 1.98, 0));
+    return g;
+  },
+  vanitybar(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    const w = 1.9 * s;
+    g.add(mesh(new THREE.BoxGeometry(0.06, 1.7, 1.1), std(0xD8CDB2, 0.8, 0), 0, 1.0, -0.35)); // wall hint
+    g.add(mesh(new THREE.BoxGeometry(w, 0.14, 0.14), std(p.variant === 'undercab' ? 0x222222 : 0x8a6d3b, 0.45, 0.6), 0, 1.25, -0.22));
+    const n = Math.max(3, Math.round(4 * s));
+    for (let i = 0; i < n; i++) {
+      const x = (i / (n - 1) - 0.5) * (w - 0.3);
+      if (p.variant === 'undercab') g.add(glowMesh(new THREE.BoxGeometry(0.3, 0.03, 0.08), hex, x, 1.17, -0.22, 1.8));
+      else g.add(bulbSmall(hex, x, 1.25, -0.1, 0.11));
+    }
+    if (p.variant === 'undercab') g.add(mesh(new THREE.BoxGeometry(w, 0.5, 0.06), std(0x8a6d3b, 0.7, 0), 0, 1.62, -0.3)); // cabinet hint
+    return g;
+  },
+  lamp(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    if (p.variant === 'arc') {
+      g.add(mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.08, 24), std(0xE8E8E8, 0.3, 0.6), -0.9, 0.04, 0));
+      const pts = [new THREE.Vector3(-0.9, 0.08, 0), new THREE.Vector3(-0.9, 1.9, 0), new THREE.Vector3(0.1, 2.15, 0), new THREE.Vector3(0.85, 1.7, 0)];
+      g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, 0.03, 8), std(0x333333, 0.4, 0.7)));
+      g.add(mesh(new THREE.CylinderGeometry(0.2, 0.28, 0.3, 20, 1, true), std(0xF5E6C8, 0.8, 0), 0.85, 1.55, 0));
+      g.add(bulbSmall(hex, 0.85, 1.5, 0, 0.1));
+      return g;
+    }
+    g.add(mesh(new THREE.CylinderGeometry(0.22 * s, 0.3 * s, 0.25, 24), std(0x7A5A8A, 0.45, 0.1), 0, 0.13, 0));
+    g.add(mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.8, 10), std(0x8a6d3b, 0.4, 0.8), 0, 0.65, 0));
+    const shade = mesh(new THREE.CylinderGeometry(0.32 * s, 0.45 * s, 0.5, 24, 1, true), new THREE.MeshStandardMaterial({ color: 0xF5E6C8, roughness: 0.9, side: THREE.DoubleSide, emissive: new THREE.Color(hex), emissiveIntensity: 0.5 }), 0, 1.25, 0);
+    shade.userData.isGlow = true; g.add(shade);
+    g.add(bulbSmall(hex, 0, 1.2, 0, 0.11));
+    return g;
+  },
+  track(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex, s = o.sizeScale;
+    const len = 2.0 * s;
+    g.add(mesh(new THREE.BoxGeometry(len, 0.12, 0.18), std(0x1a1a1a, 0.45, 0.5), 0, 1.95, 0));
+    g.add(mesh(new THREE.BoxGeometry(len, 0.05, 0.05), std(0x333333), 0, 2.02, 0));
+    const n = Math.max(2, Math.round(4 * s));
+    for (let i = 0; i < n; i++) {
+      const x = (i / (n - 1) - 0.5) * (len - 0.4);
+      const head = new THREE.Group();
+      head.add(mesh(new THREE.CylinderGeometry(0.11, 0.14, 0.3, 16), std(0x222222, 0.45, 0.5), 0, 0, 0));
+      head.add(glowMesh(new THREE.CircleGeometry(0.09, 16), hex, 0, -0.16, 0, 2.0));
+      head.position.set(x, 1.78, 0); head.rotation.z = (i % 2 ? 0.35 : -0.35); head.rotation.x = 0.2;
+      g.add(head);
+    }
+    return g;
+  },
+  switch(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex;
+    const finishHex = o.finish === 'Black' ? 0x1A1A1A : 0xF5F5F2;
+    const plateMat = std(finishHex, 0.45, 0.05);
+    g.add(mesh(new THREE.BoxGeometry(0.06, 1.7, 1.1), std(0xD8CDB2, 0.8, 0), 0, 1.0, -0.3)); // wall hint
+    g.add(mesh(new THREE.BoxGeometry(0.08, 1.25, 0.85), plateMat, 0, 1.05, -0.22));
+    if (p.variant === 'dimmer') {
+      g.add(mesh(new THREE.BoxGeometry(0.06, 0.7, 0.4), plateMat, 0, 1.05, -0.16));
+      g.add(glowMesh(new THREE.BoxGeometry(0.03, 0.5, 0.06), hex, 0, 1.05, -0.12, 1.6));
+    } else {
+      const rocker = mesh(new THREE.BoxGeometry(0.06, 0.7, 0.42), plateMat, 0, 1.05, -0.16);
+      rocker.rotation.x = 0.06; g.add(rocker);
+    }
+    g.add(glowMesh(new THREE.SphereGeometry(0.035, 12, 8), hex, 0, 1.5, -0.14, 2.2)); // LED indicator
+    for (const sy of [-0.5, 0.5]) { const screw = mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.02, 12), std(0x888888, 0.4, 0.8), 0, 1.05 + sy, -0.17); screw.rotation.x = Math.PI / 2; g.add(screw); }
+    return g;
+  },
+  plate(T, p, o) {
+    const g = new THREE.Group(), hex = o.colorHex;
+    const finishHex = o.finish === 'Black' ? 0x1A1A1A : o.finish === 'Ivory' ? 0xEFE6D0 : 0xF5F5F2;
+    const mat = std(finishHex, 0.45, 0.05);
+    g.add(mesh(new THREE.BoxGeometry(0.06, 1.7, 1.1), std(0xD8CDB2, 0.8, 0), 0, 1.0, -0.3)); // wall hint
+    const plate = mesh(new THREE.BoxGeometry(0.07, 1.25, 0.85), mat, 0, 1.05, -0.22); g.add(plate);
+    if (p.variant === 'toggle') {
+      g.add(mesh(new THREE.BoxGeometry(0.1, 0.28, 0.12), mat, 0, 1.05, -0.16));
+    } else {
+      for (const dz of [-0.2, 0.2]) {
+        g.add(mesh(new THREE.BoxGeometry(0.05, 0.42, 0.16), std(0x3a3a3a, 0.5, 0.2), 0, 1.05, -0.17 + dz));
+        for (const dy of [-0.1, 0.1]) { const screw = mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.02, 10), std(0x222222), 0, 1.05 + dy, -0.17 + dz); screw.rotation.x = Math.PI / 2; g.add(screw); }
+      }
+    }
+    g.add(glowMesh(new THREE.SphereGeometry(0.02, 10, 8), hex, 0, 1.58, -0.16, 1.2)); // tiny status dot = chosen accent
+    return g;
+  },
+});
+
+// ---- app state / rendering ----
+function resize() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+
+function applyBrightness() {
+  const b = opts.brightness / 100;
+  if (modelGroup) modelGroup.traverse(m => {
+    if (m.userData.isGlow && m.material && m.material.emissive) {
+      // Capture the builder's intended base intensity on first pass (fabric
+      // shades/drum use 0.5, glow tubes 1.6–2.4); glowMat() pre-sets it.
+      if (m.material.userData.glowBase === undefined) m.material.userData.glowBase = m.material.emissiveIntensity;
+      const base = m.material.userData.glowBase;
+      m.material.emissiveIntensity = base * (0.25 + b * 1.5);
+    }
+  });
+  glowLight.intensity = 3 + b * 14;
+  glowLight.color.set(opts.colorHex);
+  $('#brightVal').textContent = opts.brightness + '%';
+}
+function rebuild() {
+  if (modelGroup) { scene.remove(modelGroup); modelGroup.traverse(m => { if (m.geometry) m.geometry.dispose(); if (m.material) { if (Array.isArray(m.material)) m.material.forEach(x => x.dispose()); else m.material.dispose(); } }); }
+  modelGroup = BUILDERS[current.builder](THREE, current, opts);
+  const s = opts.sizeScale;
+  modelGroup.scale.setScalar(Math.min(Math.max(s, 0.55), 1.6));
+  scene.add(modelGroup);
+  applyBrightness();
+}
+function renderControls() {
+  $('#pCat').textContent = current.category + ' · ' + current.id;
+  $('#pName').textContent = current.name;
+  $('#pDesc').textContent = current.desc;
+  $('#crumbName').textContent = current.name;
+  document.title = current.name + ' — View in 3D · LitCasa';
+  $('#homekitSlot').innerHTML = current.homekit
+    ? '<span class="homekit">🏠 Works with Apple Home (HomeKit) · No hub needed</span>' : '';
+  const sel = $('#productSel');
+  sel.innerHTML = [...new Set(PRODUCTS.map(p => p.category))].map(cat =>
+    `<optgroup label="${cat}">` + PRODUCTS.filter(p => p.category === cat)
+      .map(p => `<option value="${p.id}" ${p.id === current.id ? 'selected' : ''}>${p.name}</option>`).join('') + '</optgroup>').join('');
+  // colors
+  const colors = colorsFor(current);
+  $('#colorField').hidden = !!finishesFor(current) && current.builder === 'plate';
+  $('#colorLabel').textContent = current.builder === 'switch' || current.builder === 'plate'
+    ? 'LED indicator color' : (current.builder === 'wire' || current.builder === 'controller' || current.builder === 'powersupply' ? 'Status LED color' : 'Light color');
+  $('#swatches').innerHTML = colors.map(c =>
+    `<button type="button" class="swatch" style="background:${c.hex}" title="${c.label}" aria-label="${c.label}" aria-pressed="${c.label === opts.color}" data-color="${c.label}" data-hex="${c.hex}"></button>`).join('');
+  $('#colorName').textContent = 'Selected: ' + opts.color;
+  // finish
+  const fin = finishesFor(current);
+  $('#finishField').hidden = !fin;
+  if (fin) $('#finishPills').innerHTML = fin.map(f =>
+    `<button type="button" class="pillbtn" aria-pressed="${f === opts.finish}" data-finish="${f}">${f}</button>`).join('');
+  // sizes
+  const sizes = sizesFor(current);
+  $('#sizePills').innerHTML = sizes.map(sz =>
+    `<button type="button" class="pillbtn" aria-pressed="${sz.label === opts.size}" data-size="${sz.label}">${sz.label}</button>`).join('');
+  $('#textField').hidden = !current.customText;
+  if (current.customText) $('#customText').value = opts.customText || '';
+  updateSummary();
+}
+function updateSummary() {
+  $('#summaryText').textContent = summaryText(current, opts);
+  $('#priceText').textContent = money(priceFor(current, opts));
+}
+function selectProduct(id, pushState = true) {
+  current = getProduct(id); opts = defaultOptions(current);
+  $('#brightness').value = opts.brightness;
+  if (pushState) history.replaceState(null, '', '?p=' + current.id);
+  renderControls(); rebuild();
+}
+$('#productSel').addEventListener('change', e => selectProduct(e.target.value));
+$('#swatches').addEventListener('click', e => {
+  const b = e.target.closest('[data-color]'); if (!b) return;
+  opts.color = b.dataset.color; opts.colorHex = b.dataset.hex;
+  renderControls(); rebuild();
+});
+$('#finishPills').addEventListener('click', e => {
+  const b = e.target.closest('[data-finish]'); if (!b) return;
+  opts.finish = b.dataset.finish; renderControls(); rebuild();
+});
+$('#sizePills').addEventListener('click', e => {
+  const b = e.target.closest('[data-size]'); if (!b) return;
+  const sz = sizesFor(current).find(x => x.label === b.dataset.size); if (!sz) return;
+  opts.size = sz.label; opts.sizeScale = sz.scale; opts.sizeFactor = sz.factor;
+  renderControls(); rebuild();
+});
+$('#brightness').addEventListener('input', e => { opts.brightness = +e.target.value; applyBrightness(); updateSummary(); });
+$('#customText').addEventListener('input', e => { opts.customText = e.target.value; updateSummary(); });
+$('#customText').addEventListener('change', () => rebuild());
+$('#spinBtn').addEventListener('click', () => {
+  controls.autoRotate = !controls.autoRotate;
+  $('#spinBtn').textContent = controls.autoRotate ? '⟳ Auto-rotate: on' : '⟳ Auto-rotate: off';
+  $('#spinBtn').setAttribute('aria-pressed', String(controls.autoRotate));
+});
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2600); }
+$('#addBtn').addEventListener('click', () => {
+  let cart = [];
+  try { cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); if (!Array.isArray(cart)) cart = []; } catch { cart = []; }
+  const options = { color: opts.color, size: opts.size, brightness: opts.brightness };
+  if (opts.finish) options.finish = opts.finish;
+  if (opts.customText) options.customText = opts.customText;
+  const existing = cart.find(i => i.id === current.id && JSON.stringify(i.options || {}) === JSON.stringify(options));
+  if (existing) existing.qty += 1; else cart.push({ id: current.id, qty: 1, options });
+  try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { toast('Could not save cart — browser storage is blocked'); return; }
+  toast('Added to cart ✓ — ' + current.name + ' (' + opts.color + ', ' + opts.size + ')');
+});
+function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+
+renderControls();
+resize();
+rebuild();
+animate();
+</script>
+</body>
+</html>
