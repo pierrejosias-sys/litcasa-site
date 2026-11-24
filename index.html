@@ -6,6 +6,19 @@
 <meta name="color-scheme" content="light dark"/>
 <link rel="icon" href="data:,"/>
 <title>LitCasa — Everything LED | Strips, Smart, Auto, Grow & More</title>
+<meta name="description" content="LitCasa is your everything-LED store: 59 LED strips, smart bulbs, neon signs, panels, car lights, grow lights and more. Dropship — ships direct to you across the US."/>
+<link rel="canonical" href="https://litcasa.com/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="LitCasa"/>
+<meta property="og:title" content="LitCasa — Everything LED"/>
+<meta property="og:description" content="59 LED lights and accessories — strips, smart bulbs, neon, panels, car lights, grow lights and more. Dropship store, ships direct across the US."/>
+<meta property="og:url" content="https://litcasa.com/"/>
+<meta property="og:image" content="https://litcasa.com/images/lc-001.jpg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="LitCasa — Everything LED"/>
+<meta name="twitter:description" content="59 LED lights and accessories — strips, smart bulbs, neon, panels, car lights, grow lights and more. Dropship store, ships direct across the US."/>
+<meta name="twitter:image" content="https://litcasa.com/images/lc-001.jpg"/>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"LitCasa","url":"https://litcasa.com/","parentOrganization":{"@type":"Organization","name":"HVD Holdings, LLC"}},{"@type":"WebSite","name":"LitCasa","url":"https://litcasa.com/"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -74,6 +87,10 @@ section{padding:44px 0} .sec-head{display:flex;justify-content:space-between;ali
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
 .visual{height:150px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.visual:has(img) .big{display:none}
+.thumb:has(img) .thumb-ic{display:none}
+.card h3 a:hover{text-decoration:underline}
+a.visual{cursor:pointer}
 .visual .big{font-size:56px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.25))}
 .badge{position:absolute;top:10px;left:10px;background:#16130E;color:#FFD34D;font-size:11px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;padding:6px 9px;border-radius:999px}
 .typical{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);color:#111;font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px}
@@ -103,7 +120,7 @@ footer{border-top:1px solid var(--line);padding:36px 0 90px;margin-top:20px} .fo
 <header><div class="wrap head">
   <a href="#top" class="logo">LIT<i>CASA</i><small>EVERYTHING LED</small></a>
   <nav class="main" aria-label="Main">
-    <a href="#shop">Shop All</a><a href="#categories">Categories</a><a href="#auto">Car Lights</a><a href="#grow">Grow Lights</a><a href="#essentials">Wires & Power</a><a href="#how">How It Works</a><a href="#faq">FAQ</a>
+    <a href="#shop">Shop All</a><a href="#categories">Categories</a><a href="#auto" data-filter-jump="auto">Car Lights</a><a href="#grow" data-filter-jump="grow">Grow Lights</a><a href="#essentials">Wires & Power</a><a href="#how">How It Works</a><a href="#faq">FAQ</a>
   </nav>
   <div class="head-actions">
     <label class="search"><span aria-hidden="true">⌕</span><input id="topSearch" type="search" placeholder="Search LED…" aria-label="Search products"></label>
@@ -132,7 +149,7 @@ footer{border-top:1px solid var(--line);padding:36px 0 90px;margin-top:20px} .fo
 
   <!-- CATEGORIES -->
   <section id="categories"><div class="wrap">
-    <div class="sec-head"><div><h2>Shop by category</h2><p>Every LED job covered — lights, plus the wires and power behind them. Tap a category to filter the shop below.</p></div><a href="#shop" class="btn btn-dark">View all products</a></div>
+    <div class="sec-head"><div><h2>Shop by category</h2><p>Every LED job covered — lights, plus the wires and power behind them. Tap a category to filter the shop below.</p></div><a href="#shop" class="btn btn-dark" data-view-all>View all products</a></div>
     <div class="cat-grid" id="catGrid"></div>
   </div></section>
 
@@ -174,7 +191,7 @@ footer{border-top:1px solid var(--line);padding:36px 0 90px;margin-top:20px} .fo
       <div class="bundle-item"><div><b>Wire & Connector Kit</b><br><span style="font-size:13px;opacity:.8">Clips, splitters, jumpers, solderless pins</span></div><b class="mono">$14.99*</b></div>
       <div class="bundle-item"><div><b>WiFi Controller + Remote</b><br><span style="font-size:13px;opacity:.8">App + voice control, music sync</span></div><b class="mono">$16.99*</b></div>
       <div class="bundle-item"><div><b>12V 5A Power Supply</b><br><span style="font-size:13px;opacity:.8">Runs up to ~33ft of standard strip</span></div><b class="mono">$13.99*</b></div>
-      <div class="bundle-item"><div><b>Need help sizing power?</b><br><span style="font-size:13px;opacity:.8">Rule: watts of strip × 1.2 = supply size</span></div><a href="#faq" style="text-decoration:underline;font-weight:800">Read FAQ →</a></div>
+      <div class="bundle-item"><div><b>Need help sizing power?</b><br><span style="font-size:13px;opacity:.8">Rule: watts of strip × 1.2 = supply size</span></div><a href="#power-guide" style="text-decoration:underline;font-weight:800">Read the sizing guide →</a></div>
     </div>
   </div></div></section>
 
@@ -182,14 +199,14 @@ footer{border-top:1px solid var(--line);padding:36px 0 90px;margin-top:20px} .fo
   <section id="how" style="padding-top:0"><div class="wrap">
     <div class="sec-head"><div><h2>How LitCasa works</h2><p>Built for dropshipping: you sell it, the supplier ships it. No stockroom, no packing table.</p></div></div>
     <div class="how">
-      <div class="how-card"><div class="n">1</div><h3 style="font-size:20px">You order here</h3><p>Pick your lights, check out, and get an order confirmation with tracking to follow.</p></div>
-      <div class="how-card"><div class="n">2</div><h3 style="font-size:20px">Supplier ships direct</h3><p>Your order routes to the connected supplier, who packs and ships straight to your address.</p></div>
+      <div class="how-card"><div class="n">1</div><h3 style="font-size:20px">You order here</h3><p>Pick your lights and check out. Once your payment goes through, we will email your order confirmation.</p></div>
+      <div class="how-card"><div class="n">2</div><h3 style="font-size:20px">We ship it direct</h3><p>Your order ships straight to your address. Most orders arrive within 5–10 business days.</p></div>
       <div class="how-card"><div class="n">3</div><h3 style="font-size:20px">You light it up</h3><p>Install guides for every category — strips, auto, and grow included. Support if anything's off.</p></div>
     </div>
     <div class="reviews" style="margin-top:12px">
       <div class="rev"><div class="stars">USE CASE — LIVING ROOM</div><p>TV wall glow-up: one RGBIC strip behind the TV + a WiFi controller + the right 12V supply. Add the connector kit for corners.</p><b>Starter combo from $56.97*</b></div>
       <div class="rev"><div class="stars">USE CASE — AUTO</div><p>Night-drive upgrade: 9005 LED headlight pair + interior footwell kit. Check your bulb size in the manual before ordering.</p><b>Starter combo from $59.98*</b></div>
-      <div class="rev"><div class="stars">USE CASE — INDOOR GROW</div><p>Winter herbs in Jacksonville: 100W full-spectrum panel over a 2×2 shelf, plus a clip lamp for seedlings.</p><b>Starter combo from $74.98*</b></div>
+      <div class="rev"><div class="stars">USE CASE — INDOOR GROW</div><p>Winter herbs indoors: 100W full-spectrum panel over a 2×2 shelf, plus a clip lamp for seedlings.</p><b>Starter combo from $74.98*</b></div>
     </div>
   </div></section>
 
@@ -199,23 +216,48 @@ footer{border-top:1px solid var(--line);padding:36px 0 90px;margin-top:20px} .fo
     <details open><summary>Are these final prices?</summary><p>No — prices shown are typical starter prices so the store is fully shoppable as a preview. When you connect your dropship supplier, swap in their real prices, shipping times, and product photos in this same layout.</p></details>
     <details><summary>How long does shipping take?</summary><p>Most dropship suppliers ship in 5–10 business days. Exact windows depend on the supplier and item — each product will show its live estimate once your supplier feed is connected. Free shipping applies over $50 in this starter setup.</p></details>
     <details><summary>What power supply do I need for LED strips?</summary><p>Check the strip voltage (most are 12V or 24V — never mix them), add up its watts, then size the supply 20% higher. Example: 40W of strip → at least a 48W supply. The Essentials Trio covers most single-strip runs.</p></details>
-    <details><summary>Will the car headlights fit my vehicle?</summary><p>Match the bulb size in your owner's manual (common sizes: 9005, H11, 9012). LitCasa auto listings are plug-and-play for those sizes — if your size isn't listed, message support before ordering.</p></details>
+    <details><summary>Will the car headlights fit my vehicle?</summary><p>Match the bulb size in your owner's manual (common sizes: 9005, H11, 9012). LitCasa auto listings are plug-and-play for those sizes — if your size isn't listed, <a href="#support" style="text-decoration:underline;font-weight:800">contact support</a> before ordering.</p></details>
     <details><summary>What spectrum do grow lights use?</summary><p>LitCasa grow panels are full-spectrum (sunlight-like white plus red/blue boost) — good for seedlings through harvest for herbs, greens, and houseplants.</p></details>
-    <details><summary>What if something arrives damaged?</summary><p>Contact LitCasa within 30 days with a photo and your order number for a replacement or refund through the supplier's warranty process.</p></details>
+    <details><summary>What if something arrives damaged?</summary><p>Contact LitCasa within 30 days with a photo and your order number for a replacement or refund — use the <a href="#support" style="text-decoration:underline;font-weight:800">contact support form</a> below or email <a href="mailto:pierrejosias@icloud.com" style="text-decoration:underline;font-weight:800">pierrejosias@icloud.com</a>.</p></details>
+  </div></section>
+
+  <!-- POWER SIZING GUIDE -->
+  <section id="power-guide" style="padding-top:0"><div class="wrap">
+    <div class="sec-head"><div><h2>Power sizing guide</h2><p>Pick the right power supply the first time — most LED problems are a wrong or undersized supply.</p></div></div>
+    <div class="how-card"><p style="margin-top:0"><b>The rule: watts of lights × 1.2 = minimum supply watts.</b> Add up the watts of everything on one supply, then size the supply at least 20% higher.</p>
+    <ul style="color:var(--muted);margin:0 0 12px;padding-left:22px">
+      <li>40W of strip → at least a 48W supply (40 × 1.2)</li>
+      <li>60W of strip → at least a 72W supply (60 × 1.2)</li>
+      <li>100W of panels → at least a 120W supply (100 × 1.2)</li>
+    </ul>
+    <p style="margin:0;color:var(--muted)">Match the voltage too: most strips are 12V or 24V — never mix them, and never run a 24V strip on a 12V supply (or the other way round). One supply per run; for long runs, split the load across two supplies instead of one oversized one. The Essentials Trio above covers most single-strip runs.</p></div>
   </div></section>
 
   <!-- NEWSLETTER -->
   <div class="wrap" style="padding-bottom:44px"><div class="newsletter">
-    <div><h2>Get the drop list.</h2><p style="margin:8px 0 0;font-weight:600">New lights, restocks, and 10% off your first order. One email a week, no spam.</p></div>
+    <div><h2>Get the drop list.</h2><p style="margin:8px 0 0;font-weight:600">New lights, restocks, and drop news. One email a week, no spam.</p></div>
     <form class="nl-form" id="nlForm"><input type="email" required placeholder="you@email.com" aria-label="Email for newsletter"><button class="btn btn-dark" type="submit">Join list</button></form>
+  </div></div>
+
+  <!-- CONTACT SUPPORT -->
+  <div class="wrap" id="support" style="padding-bottom:44px"><div class="how-card">
+    <h2 style="font-size:28px">Contact support</h2>
+    <p style="color:var(--muted)">Questions about an order, a size, or a damaged item? Send a message and we will get back to you by email. You can also email us directly at <a href="mailto:pierrejosias@icloud.com" style="text-decoration:underline;font-weight:800">pierrejosias@icloud.com</a>.</p>
+    <form id="supportForm">
+      <div class="two"><div class="field"><label for="supName">Name</label><input id="supName" name="name" required placeholder="Jordan Lee"></div><div class="field"><label for="supEmail">Email</label><input id="supEmail" name="email" required type="email" placeholder="you@email.com"></div></div>
+      <div class="field"><label for="supOrder">Order number (optional)</label><input id="supOrder" name="orderNumber" placeholder="e.g. LC-12345"></div>
+      <div class="field"><label for="supMsg">Message</label><textarea id="supMsg" name="message" required placeholder="How can we help?"></textarea></div>
+      <p id="supportMsg" role="status" style="display:none;font-size:14px;font-weight:700"></p>
+      <button class="btn btn-dark" type="submit">Send message →</button>
+    </form>
   </div></div>
 </main>
 
 <footer><div class="wrap">
   <div class="foot-grid">
     <div><div class="logo">LIT<i>CASA</i><small>EVERYTHING LED</small></div><p style="color:var(--muted);max-width:36ch">All-LED store for home, car, and grow — strips, bulbs, neon, panels, outdoor, wires, controllers & power. Dropship: ships direct from supplier.</p></div>
-    <div><h4>Shop</h4><a href="#shop">All products</a><a href="#categories">Categories</a><a href="#auto">Car lights</a><a href="#grow">Grow lights</a><a href="#essentials">Wires & power</a></div>
-    <div><h4>Help</h4><a href="#how">How it works</a><a href="#faq">FAQ</a><a href="/shipping.html">Shipping</a><a href="/returns.html">Returns</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/admin/">Admin</a><a href="#faq">Power sizing guide</a></div>
+    <div><h4>Shop</h4><a href="#shop">All products</a><a href="#categories">Categories</a><a href="#auto" data-filter-jump="auto">Car lights</a><a href="#grow" data-filter-jump="grow">Grow lights</a><a href="#essentials">Wires & power</a></div>
+    <div><h4>Help</h4><a href="#how">How it works</a><a href="#faq">FAQ</a><a href="/shipping.html">Shipping</a><a href="/returns.html">Returns</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/admin/">Admin</a><a href="#power-guide">Power sizing guide</a><a href="#support">Contact support</a></div>
     <div><h4>Store status</h4><p style="color:var(--muted);font-size:14px;margin:0">Starter catalog live for preview.<br>Checkout is ready to connect to your payment + dropship supplier — swap typical prices for real supplier prices before taking live orders.</p></div>
   </div>
   <p style="color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:16px;margin-top:24px">© 2026 LitCasa. *All prices are typical starter/placeholder prices for layout and preview, to be replaced with your supplier's real prices. Delivery times are typical dropship estimates.</p>
@@ -233,7 +275,7 @@ footer{border-top:1px solid var(--line);padding:36px 0 90px;margin-top:20px} .fo
     <div style="display:flex;justify-content:space-between;font-family:Archivo,sans-serif;font-size:20px;font-weight:900;margin-top:6px"><span>Total</span><span id="cartTotal">$0.00</span></div>
     <button class="btn btn-amber" id="checkoutBtn" style="width:100%;margin-top:14px">Checkout →</button>
     <button class="btn btn-ghost" data-close-cart style="width:100%;margin-top:8px">Keep shopping</button>
-    <p style="font-size:12px;color:var(--muted);text-align:center">Secure checkout shell — connect Stripe/Shopify + supplier to go live.</p>
+    <p style="font-size:12px;color:var(--muted);text-align:center">Secure checkout via Stripe — you will be redirected to pay.</p>
   </div>
 </aside></div>
 
@@ -243,21 +285,26 @@ footer{border-top:1px solid var(--line);padding:36px 0 90px;margin-top:20px} .fo
   <p style="color:var(--muted);font-size:14px">Ready for supplier connection — this form collects the order exactly as your payment processor + dropship supplier will need it.</p>
   <form id="checkoutForm">
     <div class="two"><div class="field"><label>Full name</label><input required name="name" placeholder="Jordan Lee"></div><div class="field"><label>Email</label><input required type="email" name="email" placeholder="you@email.com"></div></div>
-    <div class="field"><label>Phone</label><input required type="tel" name="phone" placeholder="(904) 555-0100"></div>
+    <div class="field"><label>Phone</label><input required type="tel" name="phone" placeholder="(555) 555-0100"></div>
     <div class="field"><label>Street address</label><input required name="address" placeholder="123 Palm Ave"></div>
-    <div class="two"><div class="field"><label>City</label><input required name="city" placeholder="Jacksonville"></div><div class="field"><label>ZIP</label><input required name="zip" placeholder="32209"></div></div>
-    <div class="field"><label>Payment</label><select name="pay"><option>Card — connect Stripe / Shop Pay to activate</option><option>PayPal — connect to activate</option></select></div>
+    <div class="two"><div class="field"><label>City</label><input required name="city" placeholder="City"></div><div class="field"><label>ZIP</label><input required name="zip" placeholder="ZIP"></div></div>
+    <div class="field"><label>Payment</label><p style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;margin:0">You will pay securely with Stripe Checkout — you will be redirected to complete payment. No card details are entered on this site.</p></div>
     <div style="background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:14px" id="checkoutSummary"></div>
     <p id="checkoutError" role="alert" style="display:none;background:#FDECEA;color:#7A271A;border:1px solid #F5C6C2;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:600"></p>
     <button class="btn btn-amber" style="width:100%;margin-top:14px" type="submit">Place order →</button>
-    <p style="font-size:12px;color:var(--muted);text-align:center">You’ll receive a confirmation email once your order is placed.</p>
+    <p style="font-size:12px;color:var(--muted);text-align:center">You will not be charged here — payment happens on the secure Stripe Checkout page.</p>
   </form>
   <div id="orderDone" style="display:none;text-align:center;padding:20px 0">
-    <div style="font-size:44px">💡</div><h3 style="font-size:26px;margin:10px 0">Order received!</h3>
+    <div style="font-size:44px">💡</div><h3 style="font-size:26px;margin:10px 0">Order confirmed!</h3>
     <p style="color:var(--muted)" id="orderMsg"></p>
     <p class="mono" id="orderNum" style="font-weight:700;background:var(--chip);display:inline-block;padding:8px 14px;border-radius:999px"></p>
     <br><button class="btn btn-dark" data-close-checkout style="margin-top:16px">Done — keep shopping</button>
-  </div>
+   </div>
+   <div id="checkoutDisabled" style="display:none;text-align:center;padding:20px 0">
+     <div style="font-size:44px">🔌</div><h3 style="font-size:26px;margin:10px 0">Checkout is being connected</h3>
+     <p style="color:var(--muted)">No order was placed and you were not charged. Please check back soon — or <a href="#support" data-close-checkout style="text-decoration:underline;font-weight:800">contact support</a> if you need help.</p>
+     <br><button class="btn btn-dark" data-close-checkout style="margin-top:16px">Done — keep shopping</button>
+   </div>
 </div></div>
 
 <div class="toast" id="toast"></div>
@@ -296,7 +343,7 @@ const FALLBACK_PRODUCTS=[
  {id:5,name:'Edison Filament LED — 6 Pack',cat:'bulbs',price:19.99,was:27.99,rating:4.8,reviews:743,ship:'fast',icon:'🕯️',bg:'linear-gradient(135deg,#F5D78A,#C98A2B)',image:'images/lc-005.jpg',desc:'Vintage look, LED efficiency. Dimmable 2700K for pendants & sconces.'},
  {id:6,name:'Motion Sensor Bulb — 2 Pack',cat:'bulbs',price:12.99,was:18.99,rating:4.5,reviews:512,ship:'fast',icon:'👋',bg:'linear-gradient(135deg,#EAF6FF,#9AD1FF)',image:'images/lc-006.jpg',desc:'Auto on/off for closets, porches, and hallways. Dusk-to-dawn sensor.'},
  {id:7,name:'Custom Neon Sign — Your Text',cat:'neon',price:89.99,was:129.99,rating:4.9,reviews:431,badge:'Custom',ship:'free',icon:'✍️',bg:'linear-gradient(135deg,#1B1035,#5B2EE5)',image:'images/lc-007.jpg',desc:'Your words in LED neon flex. Dimmer + remote included, 24" wide standard.'},
- {id:8,name:'“Good Vibes” Neon Sign',cat:'neon',price:49.99,was:69.99,rating:4.8,reviews:689,ship:'free',icon:'✨',bg:'linear-gradient(135deg,#2A0E2E,#B0308A)',image:'images/lc-008.jpg',desc:'Ready-to-hang pink neon-flex sign for bedrooms, bars, and studios.'},
+ {id:8,name:'Good Vibes Neon Sign',cat:'neon',price:49.99,was:69.99,rating:4.8,reviews:689,ship:'free',icon:'✨',bg:'linear-gradient(135deg,#2A0E2E,#B0308A)',image:'images/lc-008.jpg',desc:'Ready-to-hang pink neon-flex sign for bedrooms, bars, and studios.'},
  {id:9,name:'Neon Flex Rope — 16.4ft',cat:'neon',price:22.99,was:32.99,rating:4.6,reviews:377,ship:'fast',icon:'🌀',bg:'linear-gradient(135deg,#FF8A00,#FF3D77)',image:'images/lc-009.jpg',desc:'Bendable, cuttable neon look without glass. Indoor/outdoor IP65.'},
  {id:10,name:'Globe String Lights — 48ft',cat:'string',price:34.99,was:49.99,rating:4.8,reviews:1544,badge:'Featured',ship:'free',icon:'🎐',bg:'linear-gradient(135deg,#FFF0C2,#FFB84D)',image:'images/lc-010.jpg',desc:'Shatterproof G40 globes, connectable, commercial-grade patio string.'},
  {id:11,name:'Fairy Wire Lights — 33ft',cat:'string',price:9.99,was:14.99,rating:4.6,reviews:2210,ship:'fast',icon:'🧚',bg:'linear-gradient(135deg,#FFEFD5,#FFC98A)',image:'images/lc-011.jpg',desc:'100 warm micro-LEDs on copper wire. Jars, wreaths, centerpieces.'},
@@ -359,7 +406,7 @@ function normalizeProduct(p){
   const was=(typeof p.was==='number')?p.was:(typeof f.was==='number'?f.was:price);
   const cat=CATEGORY_SLUGS[p.category]||p.cat||f.cat||'strips';
   const image=p.image_url||p.image||f.image||null;
-  return {id:p.id,name:p.name||f.name,cat:cat,price:price,was:was,rating:p.rating||f.rating,reviews:p.reviews||f.reviews,badge:p.badge||f.badge,ship:p.ship||f.ship||'fast',homekit:p.homekit||f.homekit||false,icon:p.icon||f.icon||'💡',bg:p.bg||f.bg||'linear-gradient(135deg,#FFB800,#FF8A00)',desc:p.description||p.desc||f.desc||'',image:image};
+  return {id:numId,lc:p.id,name:p.name||f.name,cat:cat,price:price,was:was,rating:p.rating||f.rating,reviews:p.reviews||f.reviews,badge:p.badge||f.badge,ship:p.ship||f.ship||'fast',homekit:p.homekit||f.homekit||false,icon:p.icon||f.icon||'💡',bg:p.bg||f.bg||'linear-gradient(135deg,#FFB800,#FF8A00)',desc:p.description||p.desc||f.desc||'',image:image};
 }
 async function loadProducts(){
   try{
@@ -376,7 +423,7 @@ async function loadProducts(){
 let activeCat='all', cart=[]; // cart lines: [{id, qty, options}] — options is null for a plain add, or the configurator options {color,size,brightness,finish?,customText?,unitPrice?} for a 3D-configured line. Two configs of one product stay separate lines.
 const CART_KEY='litcasa-cart-v1';
 function lcId(p){return (typeof p.id==='string' && p.id.indexOf('LC-')===0)?p.id:'LC-'+String(p.id).padStart(3,'0')}
-function nativeId(lc){const n=parseInt(String(lc).replace(/\D/g,''),10);const hit=PRODUCTS.find(x=>x.id===n||x.id===lc);return hit?hit.id:n}
+function nativeId(lc){const n=parseInt(String(lc).replace(/\D/g,''),10);if(Number.isFinite(n)&&PRODUCTS.some(x=>x.id===n))return n;const hit=PRODUCTS.find(x=>x.lc===lc||x.id===lc);return hit?(typeof hit.id==='number'?hit.id:parseInt(String(hit.id).replace(/\D/g,''),10)||n):n}
 // Stable key for comparing two option sets (sorted keys, so key order never matters).
 function optionsKey(o){if(!o)return '';return Object.keys(o).filter(k=>o[k]!==undefined&&o[k]!==null).sort().map(k=>k+'='+JSON.stringify(o[k])).join('|')}
 // The old cart writer stamped {color:'Warm White',size:'One size',brightness:80} on plain lines — treat exactly that as "no options" when reading old carts.
@@ -390,6 +437,9 @@ function rekeyCart(){const next=[];for(const l of cart){l.id=nativeId(l.id);cons
 function saveCartToStorage(){try{const arr=cart.map(l=>{const e={id:lcId(PRODUCTS.find(x=>x.id==l.id)||{id:l.id}),qty:l.qty};if(l.options)e.options=l.options;return e});localStorage.setItem(CART_KEY,JSON.stringify(arr))}catch(e){}}
 function hydrateCartFromStorage(){try{const arr=JSON.parse(localStorage.getItem(CART_KEY)||'[]');if(!Array.isArray(arr))return;for(const item of arr){if(!item||!item.id)continue;const id=nativeId(item.id),options=cleanOptions(item.options);const i=findLine(id,options);if(i>=0)cart[i].qty+=(item.qty||1);else cart.push({id,qty:item.qty||1,options})} }catch(e){}}
 hydrateCartFromStorage();
+function resyncCartFromStorage(){cart=[];hydrateCartFromStorage();renderCart()}
+window.addEventListener('storage',e=>{if(e.key===CART_KEY)resyncCartFromStorage()});
+window.addEventListener('pageshow',()=>{resyncCartFromStorage();render()});
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const money=n=>'$'+n.toFixed(2);
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
@@ -403,16 +453,18 @@ $('#filters').innerHTML=CATS.map(c=>`<button class="fbtn ${c.id==='all'?'active'
 renderCats();
 function catLabel(id){return (CATS.find(c=>c.id===id)||{}).label||id}
 function render(){
-  const q=($('#shopSearch').value||$('#topSearch').value||'').toLowerCase().trim();
+  const q=($('#topSearch').value||$('#shopSearch').value||'').toLowerCase().trim();
   const sort=$('#sortSel').value, ship=$('#shipSel').value;
   let list=PRODUCTS.filter(p=>(activeCat==='all'||p.cat===activeCat)&&(ship==='all'||p.ship===ship)&&(!q||(p.name+' '+p.desc+' '+catLabel(p.cat)).toLowerCase().includes(q)));
-  if(sort==='low')list.sort((a,b)=>a.price-b.price); if(sort==='high')list.sort((a,b)=>b.price-a.price); if(sort==='rating')list.sort((a,b)=>b.rating-a.rating);
+  if(sort==='low')list.sort((a,b)=>a.price-b.price); if(sort==='high')list.sort((a,b)=>b.price-a.price); if(sort==='rating')list.sort((a,b)=>b.rating-a.rating); if(sort==='featured')list.sort((a,b)=>String(lcId(a)).localeCompare(String(lcId(b))));
   $('#resultCount').textContent=list.length+' product'+(list.length===1?'':'s');
-  $('#productGrid').innerHTML=list.length?list.map(p=>`<article class="card"><div class="visual" style="background:${p.bg}">${p.image?`<img src="${p.image}" alt="${p.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">`:``}<span class="big">${p.icon}</span>${p.badge?`<span class="badge">${p.badge}</span>`:''}<span class="typical">Typical price*</span></div><div class="card-body"><div class="card-cat">${catLabel(p.cat)} · ${p.ship==='free'?'Example: free ship*':'Example: fast ship*'}</div><h3>${p.name}</h3><div class="stars">◆ Starter listing <span>— sample specs, real reviews after launch</span></div><p>${p.desc}</p><div class="price-row"><div class="price">${money(p.price)}<s>${money(p.was)}</s></div></div><div style="display:flex;gap:8px"><button class="btn btn-dark" data-add="${p.id}" style="flex:1">Add to cart</button><a class="btn btn-ghost" href="configurator.html?p=${lcId(p)}" style="flex:1">View in 3D</a></div></div></article>`).join(''):`<div class="empty"><b style="font-size:18px;color:var(--ink)">No lights match that search.</b><br>Try “strip”, “car”, “grow”, or clear the filters.<br><button class="btn btn-amber" id="clearFilters" style="margin-top:12px">Clear filters</button></div>`;
+  const cfgUrl=p=>`configurator.html?p=${lcId(p)}`;
+  $('#productGrid').innerHTML=list.length?list.map(p=>`<article class="card"><a class="visual" href="${cfgUrl(p)}" aria-label="View ${p.name} in 3D" style="background:${p.bg}">${p.image?`<img src="${p.image}" alt="${p.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">`:``}<span class="big">${p.icon}</span>${p.badge?`<span class="badge">${p.badge}</span>`:''}<span class="typical">Typical price*</span></a><div class="card-body"><div class="card-cat">${catLabel(p.cat)} · ${p.ship==='free'?'Example: free ship*':'Example: fast ship*'}</div><h3><a href="${cfgUrl(p)}">${p.name}</a></h3><div class="stars">◆ Starter listing <span>— sample specs, real reviews after launch</span></div><p>${p.desc}</p><div class="price-row"><div class="price">${money(p.price)}<s>${money(p.was)}</s></div></div><div style="display:flex;gap:8px"><button class="btn btn-dark" data-add="${p.id}" style="flex:1">Add to cart</button><a class="btn btn-ghost" href="configurator.html?p=${lcId(p)}" style="flex:1">View in 3D</a></div></div></article>`).join(''):`<div class="empty"><b style="font-size:18px;color:var(--ink)">No lights match that search.</b><br>Try “strip”, “car”, “grow”, or clear the filters.<br><button class="btn btn-amber" id="clearFilters" style="margin-top:12px">Clear filters</button></div>`;
   const cf=$('#clearFilters'); if(cf)cf.onclick=()=>{activeCat='all';$('#shopSearch').value='';$('#topSearch').value='';$$('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.filter==='all'));render()};
 }
 function setFilter(id){activeCat=id;$$('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.filter===id));render();document.getElementById('shop').scrollIntoView({behavior:'smooth'})}
 document.addEventListener('click',e=>{
+  const va=e.target.closest('[data-view-all]'); if(va){activeCat='all';$('#shopSearch').value='';$('#topSearch').value='';$$('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.filter==='all'));render()}
   const f=e.target.closest('[data-filter]'); if(f){activeCat=f.dataset.filter;$$('.fbtn').forEach(b=>b.classList.toggle('active',b===f));render()}
   const j=e.target.closest('[data-filter-jump]'); if(j)setFilter(j.dataset.filterJump);
   const cj=e.target.closest('[data-cat-jump]'); if(cj)setFilter(cj.dataset.catJump);
@@ -424,6 +476,8 @@ document.addEventListener('click',e=>{
   const r=e.target.closest('[data-remove]'); if(r){cart.splice(+r.dataset.remove,1); renderCart()}
 });
 ['shopSearch','topSearch'].forEach(id=>$('#'+id).addEventListener('input',render));
+$('#topSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#shopSearch').value=$('#topSearch').value;render();document.getElementById('shop').scrollIntoView({behavior:'smooth'})}});
+$('#shopSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();render();document.getElementById('shop').scrollIntoView({behavior:'smooth'})}});
 $('#sortSel').addEventListener('change',render); $('#shipSel').addEventListener('change',render);
 function addToCart(id){const nid=nativeId(id);const i=findLine(nid,null);if(i>=0)cart[i].qty+=1;else cart.push({id:nid,qty:1,options:null});renderCart()}
 function totals(){let sub=0,count=0;for(const l of cart){const p=PRODUCTS.find(x=>x.id==l.id);if(!p)continue;sub+=lineUnitPrice(p,l.options)*l.qty;count+=l.qty}const ship=sub===0?0:(sub>=50?0:6.99);return{sub,count,ship,total:sub+ship}}
@@ -434,17 +488,21 @@ function renderCart(){
   const pct=Math.min(100,t.sub/50*100); $('#shipBar').style.width=pct+'%'; $('#shipMsg').textContent=t.sub>=50?'🎉 Free shipping unlocked*':`Add ${money(50-t.sub)} more for free shipping*`; $('#shipAmt').textContent=money(t.sub)+' / $50';
   const box=$('#cartItems');
   if(!t.count){box.innerHTML=`<div class="empty">Your cart is empty.<br>Add a strip, a bulb, or a grow light to get lit.</div>`;return}
-  box.innerHTML=cart.map((l,i)=>{const p=PRODUCTS.find(x=>x.id==l.id);if(!p)return '';const unit=lineUnitPrice(p,l.options);const o=l.options;return `<div class="cart-item"><div style="font-size:30px;width:52px;height:52px;border-radius:12px;background:${p.bg};display:grid;place-items:center;flex-shrink:0;overflow:hidden;position:relative">${p.image?`<img src="${p.image}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">`:``}${p.icon}</div><div style="flex:1"><b style="font-size:14px;line-height:1.2;display:block">${p.name}</b><span style="color:var(--muted);font-size:13px">${money(unit)}* typical · ${catLabel(p.cat)}</span>${o?`<span style="color:var(--muted);font-size:12px;display:block">3D config: ${o.color} · ${o.size} · ${o.brightness}%${o.finish?' · '+o.finish:''}${o.customText?' · “'+o.customText+'”':''}</span>`:''}<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><div class="qty"><button data-qty="${i}" data-d="-1" aria-label="Decrease">−</button><b>${l.qty}</b><button data-qty="${i}" data-d="1" aria-label="Increase">+</button></div><button data-remove="${i}" style="background:none;border:0;color:var(--muted);font-weight:800;cursor:pointer;min-height:36px">Remove</button></div></div><b>${money(unit*l.qty)}</b></div>`}).join('');
+  box.innerHTML=cart.map((l,i)=>{const p=PRODUCTS.find(x=>x.id==l.id);if(!p)return '';const unit=lineUnitPrice(p,l.options);const o=l.options;return `<div class="cart-item"><div class="thumb" style="font-size:30px;width:52px;height:52px;border-radius:12px;background:${p.bg};display:grid;place-items:center;flex-shrink:0;overflow:hidden;position:relative">${p.image?`<img src="${p.image}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">`:``}<span class="thumb-ic">${p.icon}</span></div><div style="flex:1"><b style="font-size:14px;line-height:1.2;display:block">${p.name}</b><span style="color:var(--muted);font-size:13px">${money(unit)}* typical · ${catLabel(p.cat)}</span>${o?`<span style="color:var(--muted);font-size:12px;display:block">3D config: ${o.color} · ${o.size} · ${o.brightness}%${o.finish?' · '+o.finish:''}${o.customText?' · “'+o.customText+'”':''}</span>`:''}<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><div class="qty"><button data-qty="${i}" data-d="-1" aria-label="Decrease">−</button><b>${l.qty}</b><button data-qty="${i}" data-d="1" aria-label="Increase">+</button></div><button data-remove="${i}" style="background:none;border:0;color:var(--muted);font-weight:800;cursor:pointer;min-height:36px">Remove</button></div></div><b>${money(unit*l.qty)}</b></div>`}).join('');
 }
 function openCart(){renderCart();$('#cartDrawer').classList.add('open')}
 function closeCart(){$('#cartDrawer').classList.remove('open')}
 $('#addBundle').onclick=()=>{[26,28,30].forEach(addToCart);toast('Essentials Trio added ✓');openCart()};
-$('#checkoutBtn').onclick=()=>{const t=totals();if(!t.count){toast('Your cart is empty');return}closeCart();$('#checkoutForm').style.display='block';$('#orderDone').style.display='none';$('#checkoutSummary').innerHTML=cart.map(l=>{const p=PRODUCTS.find(x=>x.id==l.id);if(!p)return '';const unit=lineUnitPrice(p,l.options);return `<div style="display:flex;justify-content:space-between;font-size:14px;padding:3px 0"><span>${p.icon} ${p.name}${l.options?` (${l.options.color} · ${l.options.size})`:''} × ${l.qty}</span><b>${money(unit*l.qty)}</b></div>`}).join('')+`<div style="display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:8px;padding-top:8px;font-weight:900"><span>Total (typical prices*)</span><span>${money(t.total)}</span></div><div style="font-size:12px;color:var(--muted)">Shipping (example terms*): ${t.ship===0?'FREE':money(t.ship)} · Supplier ships direct after payment connection is live.</div>`;$('#checkoutModal').classList.add('open')};
+$('#checkoutBtn').onclick=()=>{const t=totals();if(!t.count){toast('Your cart is empty');return}closeCart();$('#checkoutForm').style.display='block';$('#orderDone').style.display='none';$('#checkoutSummary').innerHTML=cart.map(l=>{const p=PRODUCTS.find(x=>x.id==l.id);if(!p)return '';const unit=lineUnitPrice(p,l.options);return `<div style="display:flex;justify-content:space-between;font-size:14px;padding:3px 0"><span>${p.icon} ${p.name}${l.options?` (${l.options.color} · ${l.options.size})`:''} × ${l.qty}</span><b>${money(unit*l.qty)}</b></div>`}).join('')+`<div style="display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:8px;padding-top:8px;font-weight:900"><span>Total (typical prices*)</span><span>${money(t.total)}</span></div><div style="font-size:12px;color:var(--muted)">Shipping: ${t.ship===0?'FREE':money(t.ship)} ($6.99 under $50, free at $50+).</div>`;$('#checkoutModal').classList.add('open')};
 function closeCheckout(){$('#checkoutModal').classList.remove('open')}
-$('#checkoutForm').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.target);const err=$('#checkoutError');if(err){err.style.display='none';err.textContent='';}if(!cart.length){toast('Your cart is empty');return}const itemCount=totals().count,localTotal=totals().total;const btn=e.target.querySelector('button[type="submit"]');const payload={customer:{name:fd.get('name'),email:fd.get('email'),phone:fd.get('phone')},items:cart.map(l=>{const it={product_id:lcId(PRODUCTS.find(x=>x.id==l.id)||{id:l.id}),quantity:l.qty};if(l.options)it.options=l.options;return it}),shipping_address:{address:fd.get('address'),city:fd.get('city'),zip:fd.get('zip')}};if(btn){btn.disabled=true;btn.textContent='Placing order…';}try{const res=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!res.ok)throw new Error('Order failed: HTTP '+res.status);const data=await res.json();const orderId=data.order_id||data.orderId||data.id;const total=typeof data.total_cents==='number'?data.total_cents/100:localTotal;$('#checkoutForm').style.display='none';$('#orderDone').style.display='block';$('#orderNum').textContent='Order '+orderId;$('#orderMsg').textContent=`Thanks, ${fd.get('name')} — your order for ${itemCount} item(s) is confirmed, ${money(total)} at typical prices. A confirmation email will follow at ${fd.get('email')}.`;e.target.reset();cart=[];renderCart();}catch(ex){if(err){err.textContent='Sorry — we couldn’t place your order. Please check your connection and try again. Your cart is saved.';err.style.display='block';}else{toast('Order failed — your cart is saved, please try again');}}finally{if(btn){btn.disabled=false;btn.textContent='Place order →';}}});
-$('#nlForm').addEventListener('submit',e=>{e.preventDefault();toast('You’re on the drop list ✓');e.target.reset()});
+$('#checkoutForm').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.target);const err=$('#checkoutError');if(err){err.style.display='none';err.textContent='';}if(!cart.length){toast('Your cart is empty');return}const localTotal=totals().total;const btn=e.target.querySelector('button[type="submit"]');const payload={customer:{name:fd.get('name'),email:fd.get('email'),phone:fd.get('phone')},items:cart.map(l=>{const it={product_id:lcId(PRODUCTS.find(x=>x.id==l.id)||{id:l.id}),quantity:l.qty};if(l.options)it.options=l.options;return it}),shipping_address:{address:fd.get('address'),city:fd.get('city'),zip:fd.get('zip')}};if(btn){btn.disabled=true;btn.textContent='Redirecting to secure checkout…';}try{const res=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await res.json().catch(()=>({}));if(res.status===501||data.error==='payments_not_connected'||data.error==='Stripe not configured'){$('#checkoutForm').style.display='none';$('#orderDone').style.display='none';$('#checkoutDisabled').style.display='block';return}if(!res.ok||!data.url)throw new Error(data.error||('Checkout failed: HTTP '+res.status));location.href=data.url}catch(ex){if(err){err.textContent='Sorry — checkout is not available right now. No order was placed and you were not charged. Please try again later or contact support.';err.style.display='block';}else{toast('Checkout unavailable — no order placed, you were not charged');}}finally{if(btn){btn.disabled=false;btn.textContent='Place order →';}}});
+$('#nlForm').addEventListener('submit',async e=>{e.preventDefault();const email=new FormData(e.target).get('email')||e.target.querySelector('input[type=email]').value;try{const res=await fetch('/api/newsletter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});if(!res.ok)throw new Error('HTTP '+res.status);toast('You’re on the drop list ✓');e.target.reset()}catch(ex){toast('Couldn’t join the list — please try again')}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCart();closeCheckout()}});
+$('#supportForm').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.target);const box=$('#supportMsg');const orderNumber=(fd.get('orderNumber')||'').trim();const body={name:fd.get('name'),email:fd.get('email'),orderNumber:orderNumber||undefined,message:fd.get('message')};if(orderNumber)body.order_id=orderNumber;try{const res=await fetch('/api/support',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!res.ok)throw new Error('HTTP '+res.status);box.textContent='Message sent ✓ — we will reply to '+fd.get('email')+'.';box.style.display='block';box.style.color='var(--green)';e.target.reset()}catch(ex){box.textContent='Couldn’t send your message — please try again or email pierrejosias@icloud.com.';box.style.display='block';box.style.color='#7A271A'}});
+// Post-payment return: ?checkout=success&session_id=... -> confirm the order.
+(async()=>{const qs=new URLSearchParams(location.search);if(qs.get('checkout')!=='success'||!qs.get('session_id'))return;$('#checkoutForm').style.display='none';$('#orderDone').style.display='none';$('#checkoutDisabled').style.display='none';$('#checkoutModal').classList.add('open');const err=$('#checkoutError');try{const res=await fetch('/api/orders/confirm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:qs.get('session_id')})});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||('HTTP '+res.status));const oid=data.order_id||data.orderId||data.id||'';const email=data.email||data.customer_email||'';$('#orderDone').style.display='block';$('#orderNum').textContent=oid?('Order '+oid):'';$('#orderMsg').textContent='Thanks — your payment went through and your order is confirmed'+(email?'. A confirmation email was sent to '+email+'.':'.');cart=[];renderCart()}catch(ex){$('#checkoutForm').style.display='block';if(err){err.textContent='We couldn’t confirm your order yet. Your payment may still have gone through — contact support with your session ID and we will check it. No new charge was made on this page.';err.style.display='block';}}})();
 loadProducts(); render(); renderCart();
+if(new URLSearchParams(location.search).get('cart')==='open')openCart();
 </script>
 </body>
 </html>

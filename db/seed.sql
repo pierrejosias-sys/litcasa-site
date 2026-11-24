@@ -16,6 +16,10 @@
 --   short slugs used in the site JS (strips/bulbs/neon/...).
 --   supplier_primary / supplier_backup are from the CSV as written.
 --   description is NULL except the 4 Smart Switches (HomeKit callout).
+--   Sizes are NOT stored in this table (no size column): configurator
+--   sizes live in configurator.mjs (SIZE_SETS). LC-050 'Recessed
+--   Downlights — 4 Pack, 6in' uses recessedDia (4/6/8 in, default 6 in),
+--   not ceilingDia (11/13/15 in). A DB re-seed cannot change sizes.
 --   image_url is 'images/lc-XXX.jpg' for every product (local photo files
 --   in the repo under images/). EXCEPTION: the 4 Smart Switches carry
 --   a HomeKit description ('Works with Apple Home (HomeKit)...') so the

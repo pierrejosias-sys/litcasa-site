@@ -94,6 +94,11 @@ export const SIZE_SETS = {
     { label: '11 in', scale: 0.85, factor: 0.85 }, { label: '13 in', scale: 1.0, factor: 1.0 },
     { label: '15 in', scale: 1.15, factor: 1.15 },
   ],
+  // Recessed downlights are sold by aperture diameter: 4/6/8 in (LC-050 is a 6in 4-pack).
+  recessedDia: [
+    { label: '4 in', scale: 0.8, factor: 0.8 }, { label: '6 in', scale: 1.0, factor: 1.0 },
+    { label: '8 in', scale: 1.2, factor: 1.25 },
+  ],
   vanityLen: [
     { label: '18 in', scale: 0.8, factor: 0.8 }, { label: '24 in', scale: 1.0, factor: 1.0 },
     { label: '36 in', scale: 1.3, factor: 1.35 },
@@ -187,7 +192,7 @@ export const PRODUCTS = [
   { id:'LC-047', name:'Table Lamp — Ceramic Base', category:'Table & Floor Lamps', slug:'lamps', price:34.99, desc:'Glazed ceramic base + fabric shade. 3-way switch, E26 base.', builder:'lamp', variant:'table', colorSet:'warm', sizeSet:'lampSize', defaultSize:0, defaultColor:0 },
   { id:'LC-048', name:'Table Lamp — Modern Fabric Shade', category:'Table & Floor Lamps', slug:'lamps', price:29.99, desc:'Modern matte base, linen shade. Inline switch, E26 base.', builder:'lamp', variant:'table', colorSet:'warm', sizeSet:'lampSize', defaultSize:0, defaultColor:0 },
   { id:'LC-049', name:'Arc Floor Lamp', category:'Table & Floor Lamps', slug:'lamps', price:79.99, desc:'Arched arm over sofas & chairs. Marble base, foot switch.', builder:'lamp', variant:'arc', colorSet:'warm', sizeSet:'lampSize', defaultSize:1, defaultColor:0 },
-  { id:'LC-050', name:'Recessed Downlights — 4 Pack, 6in', category:'Recessed Downlights', slug:'recessed', price:49.99, desc:'Canless 6in downlights, 4 pack. 5CCT selectable, IC rated.', builder:'ceiling', variant:'recessed', colorSet:'white', sizeSet:'ceilingDia', defaultSize:0, defaultColor:1 },
+  { id:'LC-050', name:'Recessed Downlights — 4 Pack, 6in', category:'Recessed Downlights', slug:'recessed', price:49.99, desc:'Canless 6in downlights, 4 pack. 5CCT selectable, IC rated.', builder:'ceiling', variant:'recessed', colorSet:'white', sizeSet:'recessedDia', defaultSize:1, defaultColor:1 },
   { id:'LC-051', name:'Track Lighting Kit — 4-Light', category:'Track Lighting', slug:'track', price:69.99, desc:'4ft track + 4 adjustable heads. Aim light where you need it.', builder:'track', variant:'rail', colorSet:'white', sizeSet:'trackLen', defaultSize:1, defaultColor:1 },
   { id:'LC-052', name:'Under-Cabinet Light Bar — 18in', category:'Under-Cabinet Lights', slug:'undercabinet', price:24.99, desc:'18in linkable bar for kitchens. Warm 3000K, plug-in or hardwire.', builder:'vanitybar', variant:'undercab', colorSet:'warm', sizeSet:'vanityLen', defaultSize:0, defaultColor:0 },
   { id:'LC-053', name:'HomeKit Dimmer Switch', category:'Smart Switches', slug:'switches', price:34.99, desc:'Works with Apple Home (HomeKit). Single-pole dimmer, no hub needed.', builder:'switch', variant:'dimmer', colorSet:'indicator', sizeSet:'gang', defaultSize:0, defaultColor:1, finish:'switchFinish', homekit:true },

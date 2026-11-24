@@ -87,7 +87,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 60px;color:var(--muted);f
   <a href="index.html" class="logo">LIT<i>CASA</i><small>EVERYTHING LED</small></a>
   <div style="margin-left:auto;display:flex;gap:8px">
     <a class="btn btn-ghost btn-sm" href="index.html">← Back to shop</a>
-    <a class="btn btn-dark btn-sm" href="index.html#shop">View cart →</a>
+    <a class="btn btn-dark btn-sm" href="index.html?cart=open#shop">View cart →</a>
   </div>
 </div></header>
 <main><div class="wrap">
@@ -159,13 +159,13 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x14100c);
 scene.fog = new THREE.Fog(0x14100c, 9, 18);
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-camera.position.set(3.4, 2.2, 4.6);
+camera.position.set(3.6, 2.0, 5.2);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
-controls.minDistance = 1.6; controls.maxDistance = 10;
+controls.minDistance = 1.6; controls.maxDistance = 12;
 controls.maxPolarAngle = Math.PI * 0.92;
 controls.autoRotate = true; controls.autoRotateSpeed = 0.9;
-controls.target.set(0, 0.9, 0);
+controls.target.set(0, 0.85, 0);
 scene.add(new THREE.AmbientLight(0xfff2dd, 0.55));
 const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(4, 6, 3); scene.add(key);
 const fill = new THREE.DirectionalLight(0xbfd4ff, 0.35); fill.position.set(-4, 3, -2); scene.add(fill);
@@ -249,8 +249,8 @@ const BUILDERS = {
     // coil / car / underglow: glowing ribbon wound in a loose spiral
     const turns = p.variant === 'underglow' ? 2 : 3, pts = [];
     for (let i = 0; i <= 140; i++) {
-      const t = i / 140, a = t * Math.PI * 2 * turns, r = 0.95 * s * (1 - t * 0.25);
-      pts.push(new THREE.Vector3(Math.cos(a) * r, 0.25 + t * 1.35, Math.sin(a) * r));
+      const t = i / 140, a = t * Math.PI * 2 * turns, r = 0.82 * s * (1 - t * 0.25);
+      pts.push(new THREE.Vector3(Math.cos(a) * r, 0.25 + t * 1.1, Math.sin(a) * r));
     }
     const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 220, 0.045, 8), glowMat(hex, 1.9));
     tube.userData.isGlow = true; g.add(tube);
@@ -674,7 +674,7 @@ function rebuild() {
   if (modelGroup) { scene.remove(modelGroup); modelGroup.traverse(m => { if (m.geometry) m.geometry.dispose(); if (m.material) { if (Array.isArray(m.material)) m.material.forEach(x => x.dispose()); else m.material.dispose(); } }); }
   modelGroup = BUILDERS[current.builder](THREE, current, opts);
   const s = opts.sizeScale;
-  modelGroup.scale.setScalar(Math.min(Math.max(s, 0.55), 1.6));
+  modelGroup.scale.setScalar(Math.min(Math.max(s, 0.55), 1.35));
   scene.add(modelGroup);
   applyBrightness();
 }
@@ -738,8 +738,9 @@ $('#sizePills').addEventListener('click', e => {
   renderControls(); rebuild();
 });
 $('#brightness').addEventListener('input', e => { opts.brightness = +e.target.value; applyBrightness(); updateSummary(); });
-$('#customText').addEventListener('input', e => { opts.customText = e.target.value; updateSummary(); });
-$('#customText').addEventListener('change', () => rebuild());
+let textRebuild = null;
+$('#customText').addEventListener('input', e => { opts.customText = e.target.value; updateSummary(); clearTimeout(textRebuild); textRebuild = setTimeout(rebuild, 180); });
+$('#customText').addEventListener('change', () => { clearTimeout(textRebuild); rebuild(); });
 $('#spinBtn').addEventListener('click', () => {
   controls.autoRotate = !controls.autoRotate;
   $('#spinBtn').textContent = controls.autoRotate ? '⟳ Auto-rotate: on' : '⟳ Auto-rotate: off';
