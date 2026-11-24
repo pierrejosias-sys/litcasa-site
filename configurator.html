@@ -749,9 +749,12 @@ function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.ad
 $('#addBtn').addEventListener('click', () => {
   let cart = [];
   try { cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); if (!Array.isArray(cart)) cart = []; } catch { cart = []; }
-  const options = { color: opts.color, size: opts.size, brightness: opts.brightness };
+  const options = { color: opts.color, size: opts.size, brightness: opts.brightness, unitPrice: priceFor(current, opts) };
   if (opts.finish) options.finish = opts.finish;
   if (opts.customText) options.customText = opts.customText;
+  // unitPrice is the size-scaled typical price for THIS configuration,
+  // so the shop cart can price the line correctly. The server never
+  // trusts it — /api/orders recomputes from the DB base price.
   const existing = cart.find(i => i.id === current.id && JSON.stringify(i.options || {}) === JSON.stringify(options));
   if (existing) existing.qty += 1; else cart.push({ id: current.id, qty: 1, options });
   try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { toast('Could not save cart — browser storage is blocked'); return; }
