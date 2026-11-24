@@ -110,8 +110,9 @@ module.exports = async (req, res) => {
         subtotal_dollars: toDollars(order.subtotal_cents),
         shipping_cents: order.shipping_cents,
         shipping_dollars: toDollars(order.shipping_cents),
-        // Shipping is TBD — $0 is a placeholder, not a final rate.
-        shipping_status: 'TBD',
+        // Shipping is calculated from the subtotal ($6.99 under $50,
+        // free at/over $50) — the stored value is what the customer saw.
+        shipping_status: 'calculated',
         total_cents: order.total_cents,
         total_dollars: toDollars(order.total_cents),
         status: order.status,

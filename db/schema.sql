@@ -179,6 +179,36 @@ CREATE INDEX IF NOT EXISTS idx_support_messages_status  ON support_messages (sta
 CREATE INDEX IF NOT EXISTS idx_support_messages_order   ON support_messages (order_id);
 
 -- --------------------------------------------------------------------------
+-- newsletter_subscribers — newsletter / drop-list signups (POST
+--   /api/newsletter). email is UNIQUE; resubscribing is a no-op
+--   (ON CONFLICT DO NOTHING). No email is sent on subscribe.
+--   Added Nov 24, 2026 — run once in the Vercel Query editor for the
+--   live litcasa-db; /api/newsletter fails until it has been applied.
+-- --------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+  id         serial PRIMARY KEY,
+  email      text NOT NULL UNIQUE,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_email ON newsletter_subscribers (email);
+
+-- --------------------------------------------------------------------------
+-- Order status values (Nov 24, 2026): the admin status endpoint
+--   accepts received / processing in addition to the original set.
+--   The CHECK constraint is dropped and re-added idempotently so
+--   re-running schema.sql upgrades databases created before these
+--   statuses existed. Run once in the Vercel Query editor for the
+--   live litcasa-db — PATCH /api/admin/orders/[id] fails with a
+--   constraint error on received/processing until it has been applied.
+-- --------------------------------------------------------------------------
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check;
+ALTER TABLE orders ADD CONSTRAINT orders_status_check
+  CHECK (status IN ('pending', 'paid', 'received', 'processing',
+                    'fulfilled', 'shipped', 'delivered', 'cancelled',
+                    'refunded'));
+
+-- --------------------------------------------------------------------------
 -- order_counters — one row per calendar date; drives the daily LC- sequence.
 --   Increment ONLY via next_order_id() (row-locked upsert), never by hand.
 -- --------------------------------------------------------------------------

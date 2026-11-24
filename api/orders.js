@@ -24,18 +24,16 @@
  *     hasOptionsColumn() in ./_lib/options.js; until the schema
  *     migration has been run, orders still work and only the
  *     options detail is not persisted.
- *   - Shipping is a flat $0 placeholder for now: shipping is TBD
- *     (no supplier shipping / duty cost confirmed yet), so
- *     shipping_cents = 0 and the response flags shipping_status
- *     'TBD'. Do not present $0 as a final shipping cost to the
- *     customer — the checkout route (separate workstream) must show
- *     shipping as TBD until real rates exist.
+ *   - Shipping is $6.99 under $50 / free at/over $50 — the same
+ *     rule the storefront shows (see ./_lib/shipping.js). The
+ *     stored shipping_cents is the final shipping cost the
+ *     customer saw: shipping_status is 'calculated'.
  *   - Creates the order (status 'pending', payment_status 'unpaid'),
  *     order_items snapshots (name + unit price at checkout time),
  *     and upserts the customer — all inside ONE transaction, with
  *     the order id reserved via getDailyOrderId() (LC-YYYYMMDD-NNN).
  *   - 201 { order_id, total_cents, total_dollars, shipping_cents,
- *           shipping_status: 'TBD', status }
+ *           shipping_status: 'calculated', status }
  *   - No Stripe call is made here and no email is sent. Payment
  *     (Stripe Checkout) is a separate endpoint / workstream.
  *
@@ -54,6 +52,7 @@ const {
   optionsKey,
   hasOptionsColumn,
 } = require('./_lib/options');
+const { shippingCentsFor } = require('./_lib/shipping');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -97,8 +96,9 @@ function publicOrder(order, items) {
     subtotal_dollars: toDollars(order.subtotal_cents),
     shipping_cents: order.shipping_cents,
     shipping_dollars: toDollars(order.shipping_cents),
-    // Shipping is TBD — see header comment. $0 here is a placeholder.
-    shipping_status: 'TBD',
+    // Shipping is calculated from the subtotal ($6.99 under $50,
+    // free at/over $50) — the stored value is what the customer saw.
+    shipping_status: 'calculated',
     total_cents: order.total_cents,
     total_dollars: toDollars(order.total_cents),
     status: order.status,
@@ -269,8 +269,9 @@ async function handlePost(req, res) {
     };
   });
   const subtotalCents = lines.reduce((sum, l) => sum + l.line_total_cents, 0);
-  // SHIPPING TBD — flat $0 placeholder. See header comment.
-  const shippingCents = 0;
+  // Shipping: $6.99 under $50, free at/over $50 — exactly what the
+  // storefront shows, so the stored value equals what the customer saw.
+  const shippingCents = shippingCentsFor(subtotalCents);
   const totalCents = subtotalCents + shippingCents;
 
   // Does the live DB have the order_items.options column yet?
@@ -334,8 +335,9 @@ async function handlePost(req, res) {
     total_dollars: toDollars(totalCents),
     subtotal_cents: subtotalCents,
     shipping_cents: shippingCents,
-    // Shipping is TBD — $0 is a placeholder, not a final rate.
-    shipping_status: 'TBD',
+    // Shipping is calculated from the subtotal — this is the final
+    // shipping cost, the same value the customer saw at checkout.
+    shipping_status: 'calculated',
     status: 'pending',
   });
 }

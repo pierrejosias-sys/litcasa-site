@@ -52,6 +52,14 @@ td.id{font-family:JetBrains Mono,monospace;font-weight:700;white-space:nowrap}
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:20px}
 .toolbar .spacer{flex:1}
 .empty{color:var(--muted);padding:24px 0 8px}
+.detail{margin-top:28px;border-top:1px solid var(--line);padding-top:20px}
+.detail h2{font-family:Archivo,sans-serif;font-size:22px;margin:0 0 4px}
+.detail h3{font-family:Archivo,sans-serif;font-size:15px;margin:20px 0 0}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0}
+.detail-grid .box{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;word-break:break-word}
+.detail-grid .box b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+.status-btns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.note{font-size:13px;color:var(--muted)}
 footer{border-top:1px solid var(--line);padding:36px 0 60px;margin-top:20px}
 footer p{color:var(--muted);font-size:12px}
 </style>
@@ -94,11 +102,29 @@ footer p{color:var(--muted);font-size:12px}
             <th>Total</th>
             <th>Status</th>
             <th>Payment status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="ordersBody"></tbody>
       </table>
       <p class="empty" id="emptyMsg" hidden>No orders yet.</p>
+    </div>
+    <div class="detail" id="orderDetail" hidden>
+      <h2 id="detailTitle">Order</h2>
+      <p class="note" id="detailMeta"></p>
+      <div class="detail-grid" id="detailGrid"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Product</th><th>Options</th><th>Qty</th><th>Unit</th><th>Line total</th></tr>
+          </thead>
+          <tbody id="detailItems"></tbody>
+        </table>
+      </div>
+      <h3>Update status</h3>
+      <div class="status-btns" id="statusBtns"></div>
+      <p class="note">Refunds are done in the Stripe dashboard — there is no refund button here. Find the payment in Stripe using the order's Stripe session id (shown above when present).</p>
+      <p class="error" id="detailError" role="alert" hidden></p>
     </div>
   </div>
 </div></main>
@@ -118,6 +144,7 @@ footer p{color:var(--muted);font-size:12px}
   var emptyMsg = document.getElementById('emptyMsg');
   var signinBtn = document.getElementById('signinBtn');
   var currentPassword = null; // held only in memory for this page session; never stored
+  var lastOrders = []; // most recent admin list, so the detail view can show the Stripe session id (the public order endpoint never exposes it)
 
   function showError(msg) {
     errorEl.textContent = msg;
@@ -145,6 +172,7 @@ footer p{color:var(--muted);font-size:12px}
     return isNaN(d.getTime()) ? String(value) : d.toLocaleString();
   }
   function renderOrders(orders) {
+    lastOrders = orders || [];
     ordersBody.innerHTML = '';
     orderCount.textContent = orders.length + (orders.length === 1 ? ' order' : ' orders');
     emptyMsg.hidden = orders.length !== 0;
@@ -163,10 +191,138 @@ footer p{color:var(--muted);font-size:12px}
         '<td>' + escapeHtml(email) + '</td>' +
         '<td>' + escapeHtml(formatMoney(o)) + '</td>' +
         '<td><span class="status-pill">' + escapeHtml(status) + '</span></td>' +
-        '<td><span class="status-pill">' + escapeHtml(payStatus) + '</span></td>';
+        '<td><span class="status-pill">' + escapeHtml(payStatus) + '</span></td>' +
+        '<td><button class="btn btn-ghost btn-sm" type="button" data-view="' + escapeHtml(id) + '">View</button></td>';
       ordersBody.appendChild(tr);
     });
   }
+
+  var STATUS_OPTIONS = ['received', 'processing', 'shipped', 'delivered', 'cancelled'];
+  var orderDetail = document.getElementById('orderDetail');
+  var detailTitle = document.getElementById('detailTitle');
+  var detailMeta = document.getElementById('detailMeta');
+  var detailGrid = document.getElementById('detailGrid');
+  var detailItems = document.getElementById('detailItems');
+  var statusBtns = document.getElementById('statusBtns');
+  var detailError = document.getElementById('detailError');
+  var currentDetailId = null;
+
+  function formatOptions(options) {
+    if (!options || typeof options !== 'object') return '—';
+    var parts = Object.keys(options).map(function (k) {
+      return k + ': ' + String(options[k]);
+    });
+    return parts.length ? parts.join(' · ') : '—';
+  }
+  function moneyCents(cents) {
+    return typeof cents === 'number' ? '$' + (cents / 100).toFixed(2) : '—';
+  }
+  function showDetailError(msg) {
+    detailError.textContent = msg;
+    detailError.hidden = false;
+  }
+
+  function renderDetail(order) {
+    currentDetailId = order.id;
+    detailTitle.textContent = 'Order ' + order.id;
+    detailMeta.textContent = 'Placed ' + formatDate(order.created_at) +
+      ' · Status: ' + (order.status || '—') +
+      ' · Payment: ' + (order.payment_status || '—');
+    var shipAddr = order.shipping_address || '—';
+    var stripeId = order.stripe_session_id || '—';
+    detailGrid.innerHTML =
+      '<div class="box"><b>Customer</b>' + escapeHtml(order.customer_name || '—') + '<br/>' +
+      escapeHtml(order.customer_email || '—') + '<br/>' +
+      escapeHtml(order.customer_phone || '') + '</div>' +
+      '<div class="box"><b>Shipping address</b>' + escapeHtml(shipAddr) + '</div>' +
+      '<div class="box"><b>Totals</b>Subtotal ' + escapeHtml(moneyCents(order.subtotal_cents)) +
+      '<br/>Shipping ' + escapeHtml(moneyCents(order.shipping_cents)) +
+      ' (' + escapeHtml(order.shipping_status || 'calculated') + ')' +
+      '<br/><strong>Total ' + escapeHtml(moneyCents(order.total_cents)) + '</strong></div>' +
+      '<div class="box"><b>Stripe session</b>' + escapeHtml(stripeId) + '</div>';
+    detailItems.innerHTML = '';
+    (order.items || []).forEach(function (it) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + escapeHtml(it.product_name || it.product_id || '—') + '</td>' +
+        '<td>' + escapeHtml(formatOptions(it.options)) + '</td>' +
+        '<td>' + escapeHtml(it.quantity) + '</td>' +
+        '<td>' + escapeHtml(moneyCents(it.unit_price_cents)) + '</td>' +
+        '<td>' + escapeHtml(moneyCents(it.line_total_cents)) + '</td>';
+      detailItems.appendChild(tr);
+    });
+    statusBtns.innerHTML = '';
+    STATUS_OPTIONS.forEach(function (s) {
+      var btn = document.createElement('button');
+      btn.className = 'btn btn-sm ' + (order.status === s ? 'btn-amber' : 'btn-ghost');
+      btn.type = 'button';
+      btn.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+      btn.disabled = order.status === s;
+      btn.addEventListener('click', function () { setOrderStatus(order.id, s); });
+      statusBtns.appendChild(btn);
+    });
+    detailError.hidden = true;
+    orderDetail.hidden = false;
+  }
+
+  async function viewOrder(id) {
+    if (!id || id === '—') return;
+    detailError.hidden = true;
+    try {
+      // Existing public order-detail endpoint (no admin key needed
+      // here — the admin page itself is behind the password gate).
+      var res = await fetch('/api/orders/' + encodeURIComponent(id));
+      if (!res.ok) {
+        showDetailError(res.status === 404 ? 'Order not found.' : 'Could not load order details.');
+        return;
+      }
+      var data = await res.json();
+      var listed = null;
+      for (var i = 0; i < lastOrders.length; i++) {
+        if ((lastOrders[i].id || lastOrders[i].order_id) === data.order.id) { listed = lastOrders[i]; break; }
+      }
+      // The public order endpoint never exposes stripe_session_id;
+      // take it from the admin list entry when we have one.
+      if (listed && listed.stripe_session_id) {
+        data.order.stripe_session_id = listed.stripe_session_id;
+      }
+      renderDetail(data.order);
+      orderDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      showDetailError('Could not reach the server. Please try again.');
+    }
+  }
+
+  async function setOrderStatus(id, status) {
+    if (!currentPassword) return;
+    detailError.hidden = true;
+    try {
+      var res = await fetch('/api/admin/orders/' + encodeURIComponent(id), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': currentPassword },
+        body: JSON.stringify({ status: status })
+      });
+      if (res.status === 401 || res.status === 403) {
+        showDetailError('Incorrect password — sign in again.');
+        return;
+      }
+      if (!res.ok) {
+        var data = null;
+        try { data = await res.json(); } catch (_e) {}
+        showDetailError((data && data.error) || 'Could not update status. Please try again.');
+        return;
+      }
+      await loadOrders(currentPassword);
+      await viewOrder(id);
+    } catch (err) {
+      showDetailError('Could not reach the server. Please try again.');
+    }
+  }
+
+  ordersBody.addEventListener('click', function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest('[data-view]') : null;
+    if (btn) viewOrder(btn.getAttribute('data-view'));
+  });
 
   async function loadOrders(password) {
     var res = await fetch('/api/admin/orders', {
@@ -223,6 +379,8 @@ footer p{color:var(--muted);font-size:12px}
     passwordInput.value = '';
     ordersBody.innerHTML = '';
     ordersSection.hidden = true;
+    orderDetail.hidden = true;
+    currentDetailId = null;
     clearError();
   });
 })();
