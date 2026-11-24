@@ -207,6 +207,7 @@ module.exports = async (req, res) => {
       sendJson(res, 200, {
         ok: true,
         orderNumber: order.id,
+        order_id: order.id,
         email: order.customer_email,
         emailSent: false,
         emailNote: 'Order already recorded for this session.',
@@ -284,6 +285,7 @@ module.exports = async (req, res) => {
         sendJson(res, 200, {
           ok: true,
           orderNumber: order.id,
+          order_id: order.id,
           email: order.customer_email,
           emailSent: emailResult.sent,
           ...(emailResult.note ? { emailNote: emailResult.note } : {}),
@@ -430,6 +432,7 @@ module.exports = async (req, res) => {
     sendJson(res, 200, {
       ok: true,
       orderNumber: orderId,
+      order_id: orderId,
       email,
       emailSent: emailResult.sent,
       ...(emailResult.note ? { emailNote: emailResult.note } : {}),

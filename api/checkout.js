@@ -123,7 +123,9 @@ module.exports = async (req, res) => {
         sendJson(res, 400, { error: 'Each item needs an id (product_id).' });
         return;
       }
-      if (!Number.isInteger(item.qty) || item.qty < 1) {
+      // Accept qty or quantity, id or product_id (frontend sends product_id/quantity).
+      const qty = item.qty ?? item.quantity;
+      if (!Number.isInteger(qty) || qty < 1) {
         sendJson(res, 400, { error: 'Each item qty must be an integer >= 1.' });
         return;
       }
@@ -173,7 +175,7 @@ module.exports = async (req, res) => {
       return {
         product_id: p.id,
         product_name: p.name,
-        quantity: item.qty,
+        quantity: item.qty ?? item.quantity,
         unit_price_cents: unitPrice,
         options,
       };
